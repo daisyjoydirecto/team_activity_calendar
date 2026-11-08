@@ -50,6 +50,18 @@ header .sub{font-size:12px;opacity:.8}
 .trip .rt{font-weight:700}.trip .rt small{display:block;font-weight:400;color:var(--muted)}
 .trip.today{background:#fff8e1}
 .vsec{padding:8px 14px 2px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between}
+/* manage lists */
+.modal.wide{max-width:860px}
+.lbody{padding:12px 18px;max-height:60vh;overflow:auto}
+.lbody table{width:100%;border-collapse:collapse;font-size:13px}
+.lbody th{text-align:left;font-size:11.5px;color:var(--muted);text-transform:uppercase;padding:6px;position:sticky;top:0;background:#fff;z-index:1}
+.lbody td{padding:4px 6px;border-top:1px solid #eef2ef}
+.lbody td input,.lbody td select{width:100%;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff}
+.lbody td input[type=color]{width:46px;height:32px;padding:2px}
+.lbody tr.new td{background:#f0fdf4}
+.lbody tr.grp td{background:#f3f7f4;font-weight:800;font-size:11.5px;color:#33463b;text-transform:uppercase}
+.lbody .x{border:0;background:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px 8px}
+.lbody .note{font-size:12px;color:var(--muted);margin:0 0 8px}
 /* multi-select */
 .ms{position:relative}
 .ms>.msb{border:1px solid var(--line);border-radius:8px;padding:7px 28px 7px 10px;background:#fff;min-width:170px;max-width:240px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;font-weight:500}
@@ -232,6 +244,7 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
   <div class="whoami">I am <select id="meSel" title="Pick your name to highlight your activities"></select></div>
   <button class="btn ghost" id="refreshBtn" title="Reload from Google Sheet">⟳ Refresh</button>
   <button class="btn ghost" id="printBtn" title="Print">🖨</button>
+  <button class="btn ghost" id="listsBtn" title="Add or edit names and activities">👥 Lists</button>
   <button class="btn ghost" id="settingsBtn" title="Settings">⚙</button>
   <button class="btn primary" id="addBtn">＋ Add activity</button>
 </header>
@@ -417,6 +430,20 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
       <button class="btn" data-close>Cancel</button>
       <button class="btn primary" id="mSave">Save</button>
     </div>
+  </div>
+</div>
+
+<!-- manage lists -->
+<div class="ov" id="lstOv">
+  <div class="modal wide">
+    <div class="mh"><h2>Manage names &amp; activities</h2><button class="btn sm" data-close>✕</button></div>
+    <div style="padding:12px 18px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="tabs" id="lTabs"><button data-l="reps">👥 Names</button><button data-l="types">📋 Activities</button><button data-l="services">🔧 Vehicle services</button></div>
+      <input type="search" id="lSearch" placeholder="Search…" style="border:1px solid var(--line);border-radius:8px;padding:7px 9px;flex:1;min-width:140px">
+      <button class="btn" id="lAdd">＋ Add</button>
+    </div>
+    <div class="lbody" id="lBody"></div>
+    <div class="mf"><span class="foot sp" id="lMsg"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="lSave">Save changes</button></div>
   </div>
 </div>
 
@@ -1151,6 +1178,68 @@ async function updateOdo(plate) {
   try { await api('Vehicles', 'update', { item: Object.assign({}, v, { odo: n }) }); toast('Odometer updated'); } catch (e) { toast('⚠ ' + e.message, 4000); }
 }
 
+/* ====================== MANAGE LISTS ====================== */
+function openLists() {
+  S.ldraft = JSON.parse(JSON.stringify(S.lists));
+  S.ltab = S.ltab || 'reps';
+  $('#lSearch').value = ''; $('#lMsg').textContent = '';
+  renderLists(); show('#lstOv');
+}
+function renderLists() {
+  const d = S.ldraft, t = S.ltab, q = $('#lSearch').value.trim().toLowerCase();
+  $$('#lTabs button').forEach(b => b.classList.toggle('on', b.dataset.l === t));
+  const match = (...xs) => !q || xs.join(' ').toLowerCase().includes(q);
+  const teamNames = d.teams.map(x => x.name);
+  const v = s => esc(s == null ? '' : s);
+  let html = '';
+  if (t === 'reps') {
+    const teams = [...new Set(['Management', ...teamNames, ...d.reps.map(r => r.team).filter(Boolean)])];
+    const secs = [...new Set(d.reps.map(r => r.section).filter(Boolean))];
+    html = `<p class="note">Names appear in “I am”, the representative filter and the activity form. Group them by <b>Team</b> and <b>Section</b> (e.g. Sales › Poultry). Renaming someone doesn't change their old calendar entries.</p>
+      <datalist id="dlTeams">${teams.map(x => `<option>${v(x)}</option>`).join('')}</datalist><datalist id="dlSecs">${secs.map(x => `<option>${v(x)}</option>`).join('')}</datalist>
+      <table><thead><tr><th style="width:44%">Full name</th><th>Team</th><th>Section</th><th></th></tr></thead><tbody>` +
+      d.reps.map((r, i) => match(r.name, r.team, r.section) ? `<tr class="${r._new ? 'new' : ''}"><td><input data-i="${i}" data-k="name" value="${v(r.name)}" placeholder="e.g. Juan Dela Cruz"></td>
+        <td><input data-i="${i}" data-k="team" value="${v(r.team)}" list="dlTeams"></td><td><input data-i="${i}" data-k="section" value="${v(r.section)}" list="dlSecs" placeholder="e.g. Poultry"></td>
+        <td><button class="x" data-i="${i}" title="Remove">✕</button></td></tr>` : '').join('') + '</tbody></table>';
+  } else if (t === 'types') {
+    html = `<p class="note">Activity types show in the “Activity” dropdown. <b>Team</b> decides when it appears (blank = for every team). Rest Day and Leave are built in. Keep their names the same.</p>
+      <table><thead><tr><th style="width:38%">Activity name</th><th>Color</th><th>Team</th><th>Preview</th><th></th></tr></thead><tbody>` +
+      d.types.map((x, i) => match(x.name, x.team) ? `<tr class="${x._new ? 'new' : ''}"><td><input data-i="${i}" data-k="name" value="${v(x.name)}" placeholder="e.g. Market Survey"></td>
+        <td><input type="color" data-i="${i}" data-k="color" value="${/^#[0-9a-f]{6}$/i.test(x.color) ? x.color : '#e7e6e6'}"></td>
+        <td><select data-i="${i}" data-k="team"><option value="">Any team</option>${teamNames.map(n => `<option ${n === x.team ? 'selected' : ''}>${v(n)}</option>`).join('')}</select></td>
+        <td><span class="chip" style="background:${v(x.color || '#e7e6e6')};--tc:${teamColor(x.team)};max-width:160px">${v(x.name || 'Preview')}</span></td>
+        <td><button class="x" data-i="${i}" title="Remove">✕</button></td></tr>` : '').join('') + '</tbody></table>';
+  } else {
+    html = `<p class="note">Service types for the vehicle log. Set how often each is due. Reminders use whichever comes first. Leave 0 for no automatic reminder.</p>
+      <table><thead><tr><th style="width:50%">Service</th><th>Every (km)</th><th>Every (months)</th><th></th></tr></thead><tbody>` +
+      d.services.map((x, i) => match(x.name) ? `<tr class="${x._new ? 'new' : ''}"><td><input data-i="${i}" data-k="name" value="${v(x.name)}" placeholder="e.g. Wheel Alignment"></td>
+        <td><input type="number" min="0" step="500" data-i="${i}" data-k="km" value="${x.km || 0}"></td><td><input type="number" min="0" data-i="${i}" data-k="months" value="${x.months || 0}"></td>
+        <td><button class="x" data-i="${i}" title="Remove">✕</button></td></tr>` : '').join('') + '</tbody></table>';
+  }
+  $('#lBody').innerHTML = html;
+}
+async function saveLists() {
+  const d = S.ldraft, msg = $('#lMsg');
+  const clean = arr => arr.map(x => { const o = Object.assign({}, x); delete o._new; Object.keys(o).forEach(k => { if (typeof o[k] === 'string') o[k] = o[k].trim(); }); return o; }).filter(x => x.name);
+  const L = { reps: clean(d.reps), types: clean(d.types), teams: clean(d.teams), services: clean(d.services) };
+  for (const [k, lbl] of [['reps', 'name'], ['types', 'activity'], ['services', 'service']]) {
+    const seen = new Set(), dup = L[k].find(x => { const n = x.name.toLowerCase(); if (seen.has(n)) return true; seen.add(n); return false; });
+    if (dup) { msg.textContent = '⚠ Duplicate ' + lbl + ': ' + dup.name; return; }
+  }
+  if (L.reps.some(r => !r.team)) { msg.textContent = '⚠ Every name needs a team.'; return; }
+  const btn = $('#lSave'); btn.disabled = true; btn.innerHTML = '<span class="spin dk"></span> Saving';
+  try {
+    if (S.demo) { S.lists = L; fillLists(); renderAll(); }
+    else {
+      const r = await fetch(S.api, { method: 'POST', body: JSON.stringify({ action: 'saveLists', lists: L, pin: S.pin, user: S.me }) });
+      const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Save failed');
+      await load(true);
+    }
+    hide('#lstOv'); toast('Lists saved');
+  } catch (e) { msg.textContent = '⚠ ' + e.message; }
+  btn.disabled = false; btn.textContent = 'Save changes';
+}
+
 /* ====================== MODALS ====================== */
 function show(s) { $(s).classList.add('show'); }
 function hide(s) { $(s).classList.remove('show'); }
@@ -1259,6 +1348,31 @@ $('#mform').plate.onchange = mxHints;
 $('#mform').service.onchange = mxHints;
 
 $('#refreshBtn').onclick = () => load();
+$('#listsBtn').onclick = openLists;
+$('#lTabs').onclick = e => { const b = e.target.closest('button'); if (b) { S.ltab = b.dataset.l; $('#lSearch').value = ''; renderLists(); } };
+$('#lSearch').oninput = renderLists;
+$('#lAdd').onclick = () => {
+  const d = S.ldraft, t = S.ltab, q = $('#lSearch').value.trim();
+  if (t === 'reps') { const last = d.reps[d.reps.length - 1] || {}; d.reps.push({ name: q, team: last.team || 'Sales', section: last.section || '', _new: 1 }); }
+  if (t === 'types') d.types.push({ name: q, color: '#DBEAFE', team: '', _new: 1 });
+  if (t === 'services') d.services.push({ name: q, km: 0, months: 0, _new: 1 });
+  $('#lSearch').value = ''; renderLists();
+  const rows = $$('#lBody tr.new'); const r = rows[rows.length - 1]; if (r) { r.scrollIntoView({ block: 'center' }); r.querySelector('input').focus(); }
+};
+$('#lBody').addEventListener('input', e => {
+  const el = e.target, k = el.dataset.k, i = +el.dataset.i; if (!k) return;
+  let v = el.value; if (k === 'km' || k === 'months') v = Number(v) || 0;
+  S.ldraft[S.ltab][i][k] = v;
+  if (k === 'color') { const p = el.closest('tr').querySelector('.chip'); if (p) p.style.background = v; }
+  if (k === 'name') { const p = el.closest('tr').querySelector('.chip'); if (p) p.textContent = v || 'Preview'; }
+});
+$('#lBody').addEventListener('click', e => {
+  const x = e.target.closest('.x'); if (!x) return;
+  const arr = S.ldraft[S.ltab], it = arr[+x.dataset.i];
+  if (it.name && !it._new && !confirm('Remove “' + it.name + '” from the list?\nOld calendar entries keep the name.')) return;
+  arr.splice(+x.dataset.i, 1); renderLists();
+});
+$('#lSave').onclick = saveLists;
 $('#printBtn').onclick = () => window.print();
 $('#settingsBtn').onclick = () => { $('#sApi').value = store.get('api', ''); $('#sPin').value = S.pin; $('#sRef').value = S.refreshMin; show('#setOv'); };
 $('#setSave').onclick = () => {
