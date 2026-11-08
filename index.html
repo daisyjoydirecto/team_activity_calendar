@@ -190,6 +190,10 @@ table.month td.wk b{font-size:17px;color:var(--brand)}
 /* aside */
 aside{display:flex;flex-direction:column;gap:14px}
 aside .card{padding:12px 14px}
+#myList,#todayList{max-height:340px;overflow-y:auto}
+#offList,#vAlerts,#byType{max-height:240px;overflow-y:auto}
+#myList,#todayList,#offList,#vAlerts,#byType{scrollbar-width:thin;padding-right:4px;overscroll-behavior:contain}
+aside h3 .cnt2{float:right;font-size:11px;background:#eef2ef;color:#33463b;border-radius:99px;padding:1px 7px;letter-spacing:0}
 aside h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#33463b}
 .mini{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);cursor:pointer;font-size:13px}
 .mini:last-child{border-bottom:0}
@@ -332,7 +336,7 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
     <section class="card" id="view" style="overflow:hidden"></section>
     <aside>
       <div class="card"><h3 id="kpiTitle">This month</h3><div class="kpis" id="kpis"></div></div>
-      <div class="card"><h3>Team today</h3><div id="todayList"></div></div>
+      <div class="card"><h3 id="todayTitle">Team today</h3><div id="todayList"></div></div>
       <div class="card"><h3>🏖 Off today (rest day / leave)</h3><div id="offList"></div></div>
       <div class="card"><h3 id="myTitle">My next 14 days</h3><div id="myList"></div></div>
       <div class="card"><h3>Vehicle alerts</h3><div id="vAlerts"></div></div>
@@ -959,13 +963,15 @@ function renderAside() {
   const today = todayStr(), c = pd(S.cursor);
   const mFirst = ds(new Date(c.getFullYear(), c.getMonth(), 1)), mLast = ds(new Date(c.getFullYear(), c.getMonth() + 1, 0));
   const all = calEvents().filter(a => a.status !== 'Cancelled');
+  const tl = on(all, today).filter(a => !isOff(a.type));
+  $('#todayTitle').innerHTML = 'Team today' + (tl.length ? `<span class="cnt2">${tl.length}</span>` : '');
   $('#todayList').innerHTML = on(all, today).filter(a => !isOff(a.type)).map(a => mini(a)).join('') || '<div class="foot">No team activities today.</div>';
   const offs = on(all, today).filter(a => isOff(a.type));
   $('#offList').innerHTML = offs.map(a => `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${tFirst(a)}"></span><div><b>${esc(a.reps.join(', '))}</b><small>${esc(a.leaveType || a.type)}${a.end !== a.start ? ' · until ' + fmtDate(a.end) : ''}</small></div></div>`).join('') || '<div class="foot">Everyone is on duty today.</div>';
   if (S.me) {
-    $('#myTitle').textContent = S.me + ' — next 14 days';
     const end = addDays(today, 13);
     const mine = all.filter(a => isMine(a) && a.end >= today && a.start <= end && a.status !== 'Done').sort((a, b) => a.start.localeCompare(b.start) || byTime(a, b));
+    $('#myTitle').innerHTML = esc(S.me) + ' — next 14 days' + (mine.length ? `<span class="cnt2">${mine.length}</span>` : '');
     $('#myList').innerHTML = mine.map(a => mini(a, true)).join('') || '<div class="foot">Nothing scheduled for you.</div>';
   } else {
     $('#myTitle').textContent = 'My next 14 days';
