@@ -51,6 +51,11 @@ header .sub{font-size:12px;opacity:.8}
 .trip .rt{font-weight:700}.trip .rt small{display:block;font-weight:400;color:var(--muted)}
 .trip.today{background:#fff8e1}
 .vsec{padding:8px 14px 2px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between}
+/* team picker */
+.tpick{display:flex;gap:6px;flex-wrap:wrap}
+.tpick label{display:flex;align-items:center;gap:5px;border:2px solid var(--tc);color:var(--tc);border-radius:999px;padding:5px 11px;font-weight:700;font-size:13px;cursor:pointer;user-select:none}
+.tpick label.on{background:var(--tc);color:#fff}
+.tpick input{display:none}
 /* repeat / dates */
 .rmode{margin:2px 0 8px;width:max-content;max-width:100%;flex-wrap:wrap}
 .rbox{display:none;background:#f6f9f7;border:1px solid var(--line);border-radius:10px;padding:10px;gap:8px;flex-direction:column}
@@ -75,6 +80,7 @@ header .sub{font-size:12px;opacity:.8}
 .picked span b{cursor:pointer;margin-left:4px;padding:0 4px}
 .rprev{font-size:12px;color:#33463b;margin-top:6px}
 #form.rdates .datef{display:none}
+#form.rmulti .endf{display:none}
 /* history */
 .hsel{border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fff}
 .htable td{vertical-align:top}
@@ -142,7 +148,9 @@ table.month td.wk b{font-size:17px;color:var(--brand)}
 .chip.overdue,.ev.overdue{outline:1.5px solid var(--red)}
 .more{font-size:11px;color:var(--brand2);font-weight:700;padding:0 4px}
 /* week */
-.week{display:grid;grid-template-columns:repeat(7,1fr)}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.ev .m{overflow-wrap:break-word}
+.ev .tag{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;margin-bottom:2px}
 .week .col{border-right:1px solid var(--line);min-height:420px}
 .week .col:last-child{border-right:0}
 .week .hd{padding:8px;border-bottom:1px solid var(--line);background:#e9efeb;text-align:center;cursor:pointer}
@@ -355,7 +363,7 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
   <div class="modal">
     <div class="mh"><h2 id="formTitle">Add activity</h2><button class="btn sm" data-close>✕</button></div>
     <form id="form" class="mb" autocomplete="off">
-      <div class="f"><label>Whose activity? *</label><select name="team" required></select></div>
+      <div class="f"><label>Whose activity? * <span class="hint" style="font-weight:500">(tick one or more)</span></label><div class="tpick" id="teamPick"></div></div>
       <div class="f"><label>Activity *</label><select name="type" required></select></div>
       <div class="f full offf"><div class="offbox">
         <div class="f" id="leaveTypeWrap"><label>Leave type *</label><select name="leaveType"><option value="">— select —</option><option>Vacation Leave</option><option>Sick Leave</option><option>Emergency Leave</option><option>Bereavement Leave</option><option>Maternity / Paternity Leave</option><option>Birthday Leave</option><option>Leave Without Pay</option><option>Other</option></select></div>
@@ -363,7 +371,7 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
       </div></div>
       <div class="f full"><label id="titleLabel">Title / description *</label><input name="title" placeholder="e.g. Customer pick-up – Pik&Pak"></div>
       <div class="f datef"><label>Start date *</label><input type="date" name="start" required></div>
-      <div class="f datef"><label>End date (multi-day)</label><input type="date" name="end"></div>
+      <div class="f datef endf"><label>End date (multi-day)</label><input type="date" name="end"></div>
       <div class="f work"><label>Start / departure time</label><input type="time" name="startTime"></div>
       <div class="f work"><label>End / return time</label><input type="time" name="endTime"></div>
       <div class="f full"><label id="repLabel">Representative(s) *</label><div class="reps" id="repBox"></div></div>
@@ -489,7 +497,7 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
       <input type="search" id="hSearch" placeholder="Search…" style="border:1px solid var(--line);border-radius:8px;padding:7px 9px;flex:1;min-width:140px">
     </div>
     <div class="lbody" id="hBody" style="max-height:65vh"></div>
-    <div class="mf"><span class="foot sp" id="hMsg"></span><button class="btn danger" id="hEmpty">Empty trash</button><button class="btn" data-close>Close</button></div>
+    <div class="mf"><span class="foot sp" id="hMsg"></span><button class="btn" id="hDups" title="Find activities entered more than once">🧹 Remove duplicates</button><button class="btn danger" id="hEmpty">Empty trash</button><button class="btn" data-close>Close</button></div>
   </div>
 </div>
 
@@ -595,6 +603,20 @@ function colorOf(type) {
 function teamColor(name) { if (name === 'Vehicles') return VEH_TEAM.color; const t = S.lists.teams.find(x => x.name === name); return (t && t.color) || '#94a3b8'; }
 const allTeams = () => [...S.lists.teams.map(t => t.name), 'Vehicles'];
 const repTeam = n => (S.lists.reps.find(r => r.name === n) || {}).team || '';
+const evTeams = e => e.teams && e.teams.length ? e.teams : (e.team ? [e.team] : []);
+const tFirst = e => teamColor(evTeams(e)[0] || '');
+// left border colour: one team = solid, several teams = striped
+function tStyle(e) {
+  const ts = evTeams(e);
+  if (ts.length < 2) return `--tc:${tFirst(e)}`;
+  const step = 100 / ts.length;
+  return `--tc:${tFirst(e)};border-image:linear-gradient(to bottom,${ts.map((t, i) => `${teamColor(t)} ${i * step}% ${(i + 1) * step}%`).join(',')}) 1`;
+}
+const teamTags = e => evTeams(e).map(t => `<span class="tag" style="--tc:${teamColor(t)}">${esc(t)}</span>`).join('');
+const formTeams = () => $$('#teamPick input:checked').map(i => i.value);
+function renderTeamPick(sel) {
+  $('#teamPick').innerHTML = ACT_TEAMS().map(t => `<label class="${sel.includes(t) ? 'on' : ''}" style="--tc:${teamColor(t)}"><input type="checkbox" value="${esc(t)}" ${sel.includes(t) ? 'checked' : ''}>${esc(t)}</label>`).join('');
+}
 const repSecKey = n => { const r = S.lists.reps.find(x => x.name === n); return r ? (r.team || 'Others') + ' › ' + (r.section || 'General') : ''; };
 // reps grouped as { team: { section: [names] } } in Lists order
 function repTree() {
@@ -638,7 +660,7 @@ function normAct(a) {
   const start = a.start, end = a.end && a.end >= a.start ? a.end : a.start;
   return {
     kind: 'act', id: String(a.id), start, end, startTime: normTime(a.startTime), endTime: normTime(a.endTime),
-    team: a.team || '', type: a.type || 'Other', title: a.title || a.type || 'Activity', reps: splitReps(a.reps),
+    teams: splitReps(a.team), team: splitReps(a.team).join(', '), type: a.type || 'Other', title: a.title || a.type || 'Activity', reps: splitReps(a.reps),
     qty: num(a.qty), unit: a.unit || '', location: a.location || '', status: a.status || 'Scheduled', notes: a.notes || '',
     vehicle: String(a.vehicle || '').trim(), route: a.route || '', leaveType: a.leaveType || '', reason: a.reason || '',
     updatedBy: a.updatedBy || '', updatedAt: a.updatedAt || ''
@@ -651,7 +673,7 @@ function fillLists() {
   ['Sales', 'MCP', 'Slaughterhouse', 'Growing'].forEach((n, i) => { if (!L.teams.find(t => t.name === n)) L.teams.push({ name: n, color: ['#2563EB', '#7C3AED', '#16A34A', '#B45309'][i] }); });
   S.f.teams = S.f.teams.filter(t => allTeams().includes(t));
   const types = new Set(L.types.map(t => t.name));
-  S.acts.forEach(a => { if (!types.has(a.type)) { types.add(a.type); L.types.push({ name: a.type, color: '', team: a.team }); } });
+  S.acts.forEach(a => { if (!types.has(a.type)) { types.add(a.type); L.types.push({ name: a.type, color: '', team: a.teams[0] || '' }); } });
   const svcs = new Set(L.services.map(s => s.name));
   S.maint.forEach(m => { if (!svcs.has(m.service)) { svcs.add(m.service); L.services.push({ name: m.service, km: 0, months: 0 }); } });
   if (!S.f.teams.length) S.f.teams = allTeams();
@@ -716,7 +738,8 @@ function calEvents() {
 }
 function passes(e, f) {
   f = f || S.f;
-  if (e.team && !f.teams.includes(e.team)) return false;
+  const et = e.teams || (e.team ? [e.team] : []);
+  if (et.length && !et.some(t => f.teams.includes(t))) return false;
   if (f.reps.length && !e.reps.some(r => f.reps.includes(r))) return false;
   if (f.secs.length && !e.reps.some(r => f.secs.includes(repSecKey(r)))) return false;
   if (f.types.length && !f.types.includes(e.type)) return false;
@@ -833,13 +856,13 @@ function evClass(e) { return [isMine(e) && 'mine', e.status === 'Cancelled' && '
 function chip(a) {
   const tip = `${a.title}\n${a.team ? a.team + ' · ' : ''}${a.type}${a.startTime ? ' · ' + fmtTime(a.startTime) : ''}${a.reps.length ? '\n' + a.reps.join(', ') : ''}${a.location ? '\n@ ' + a.location : ''}${a.notes ? '\n' + a.notes : ''}`;
   const icon = a.kind === 'due' ? '⚠ ' : a.kind === 'mx' ? '🔧 ' : (a.status === 'Done' ? '✔ ' : '') + (a.type === 'Leave' ? '🏖 ' : a.type === 'Rest Day' ? '🛌 ' : a.vehicle ? '🚚 ' : '');
-  return `<span class="chip ${evClass(a)}" data-id="${esc(a.id)}" title="${esc(tip)}" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}">${icon}${a.startTime ? '<b>' + fmtTime(a.startTime) + '</b> ' : ''}${esc(a.title)}</span>`;
+  return `<span class="chip ${evClass(a)}" data-id="${esc(a.id)}" title="${esc(tip)}" style="background:${colorOf(a.type)};${tStyle(a)}">${icon}${a.startTime ? '<b>' + fmtTime(a.startTime) + '</b> ' : ''}${esc(a.title)}</span>`;
 }
 function evCard(a, withDate) {
   const meta = [a.reps.join(', '), a.location && '@ ' + a.location, a.qty !== '' && a.qty + ' ' + a.unit, a.vehicle && '🚚 ' + vName(a.vehicle) + (a.route ? ': ' + a.route : '')].filter(Boolean).join(' · ');
-  return `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}">
+  return `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};${tStyle(a)}">
     <div class="t">${a.status === 'Done' ? '✔ ' : ''}${a.startTime ? fmtTime(a.startTime) + ' · ' : ''}${esc(a.title)}</div>
-    <div class="m">${a.team ? `<span class="tag" style="--tc:${teamColor(a.team)}">${esc(a.team)}</span>` : ''}${esc(a.type)}${withDate && a.end !== a.start ? ' · ' + fmtDate(a.start) + ' – ' + fmtDate(a.end) : ''}</div>
+    <div class="m">${teamTags(a)}${esc(a.type)}${withDate && a.end !== a.start ? ' · ' + fmtDate(a.start) + ' – ' + fmtDate(a.end) : ''}</div>
     ${meta ? `<div class="m">${esc(meta)}</div>` : ''}
   </div>`;
 }
@@ -885,16 +908,16 @@ function renderView() {
     for (let day = first; day <= last; day = addDays(day, 1)) {
       const evs = on(list, day); if (!evs.length) continue;
       h += `<div class="day ${day === today ? 'today' : ''}"><div class="dl">${fmtDate(day, { month: 'short', day: 'numeric' })}<small>${DOW[pd(day).getDay()]}</small></div><div class="items">` +
-        evs.map(a => `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}">
+        evs.map(a => `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};${tStyle(a)}">
           <div class="t">${a.startTime ? fmtTime(a.startTime) : 'All day'}</div>
-          <div><div class="t">${esc(a.title)}</div><div class="m">${a.team ? `<span class="tag" style="--tc:${teamColor(a.team)}">${esc(a.team)}</span>` : ''}${esc([a.type, a.reps.join(', '), a.location && '@ ' + a.location].filter(Boolean).join(' · '))}</div></div>
+          <div><div class="t">${esc(a.title)}</div><div class="m">${teamTags(a)}${esc([a.type, a.reps.join(', '), a.location && '@ ' + a.location].filter(Boolean).join(' · '))}</div></div>
           <span class="badge ${esc(a.status)}">${esc(a.status)}</span></div>`).join('') + '</div></div>';
     }
     v.innerHTML = h ? '<div class="list">' + h + '</div>' : '<div class="empty">No activities match the filters this month.</div>';
   }
 }
 function mini(a, showDate) {
-  return `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}"></span><div>
+  return `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${tFirst(a)}"></span><div>
     <b>${esc(a.title)}</b><small>${showDate ? fmtDate(a.start) + (a.end !== a.start ? ' – ' + fmtDate(a.end) : '') + ' · ' : ''}${a.startTime ? fmtTime(a.startTime) + ' · ' : ''}${esc([a.team, a.reps.join(', ')].filter(Boolean).join(' · '))}</small></div></div>`;
 }
 function renderAside() {
@@ -903,7 +926,7 @@ function renderAside() {
   const all = calEvents().filter(a => a.status !== 'Cancelled');
   $('#todayList').innerHTML = on(all, today).filter(a => !isOff(a.type)).map(a => mini(a)).join('') || '<div class="foot">No team activities today.</div>';
   const offs = on(all, today).filter(a => isOff(a.type));
-  $('#offList').innerHTML = offs.map(a => `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}"></span><div><b>${esc(a.reps.join(', '))}</b><small>${esc(a.leaveType || a.type)}${a.end !== a.start ? ' · until ' + fmtDate(a.end) : ''}</small></div></div>`).join('') || '<div class="foot">Everyone is on duty today.</div>';
+  $('#offList').innerHTML = offs.map(a => `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${tFirst(a)}"></span><div><b>${esc(a.reps.join(', '))}</b><small>${esc(a.leaveType || a.type)}${a.end !== a.start ? ' · until ' + fmtDate(a.end) : ''}</small></div></div>`).join('') || '<div class="foot">Everyone is on duty today.</div>';
   if (S.me) {
     $('#myTitle').textContent = S.me + ' — next 14 days';
     const end = addDays(today, 13);
@@ -1047,8 +1070,8 @@ function openForm(pre, editing) {
   S.editing = editing || null;
   const fm = $('#form');
   fm.reset();
-  fm.team.innerHTML = ACT_TEAMS().map(t => `<option>${esc(t)}</option>`).join('');
-  fm.team.value = pre.team || repTeam(S.me) || ACT_TEAMS()[0];
+  const pt = pre.teams || splitReps(pre.team);
+  renderTeamPick(pt.length ? pt : [repTeam(S.me) && ACT_TEAMS().includes(repTeam(S.me)) ? repTeam(S.me) : ACT_TEAMS()[0]]);
   const sel = new Set(pre.reps || (S.me && !editing ? [S.me] : []));
   $('#repBox').innerHTML = Object.entries(repTree()).flatMap(([t, secs]) => Object.entries(secs).map(([s, names]) =>
     `<div><div class="grp">${esc(t + (s !== 'General' ? ' › ' + s : ''))}</div><div class="row">${names.map(n =>
@@ -1069,8 +1092,8 @@ function openForm(pre, editing) {
   setTimeout(() => fm.title.focus(), 50);
 }
 function fillTypes(keep) {
-  const fm = $('#form'), team = fm.team.value;
-  const types = S.lists.types.filter(t => !t.team || t.team === team).map(t => t.name);
+  const fm = $('#form'), teams = formTeams();
+  const types = S.lists.types.filter(t => !t.team || teams.includes(t.team)).map(t => t.name);
   if (keep && !types.includes(keep)) types.unshift(keep);
   fm.type.innerHTML = types.map(t => `<option>${esc(t)}</option>`).join('');
   if (keep) fm.type.value = keep;
@@ -1108,11 +1131,13 @@ function vehToggle() {
 }
 function repLabel() {
   if (isOff($('#form').type.value)) { $('#repLabel').textContent = 'Who is on ' + ($('#form').type.value === 'Leave' ? 'leave' : 'rest day') + '? *'; return; }
-  $('#repLabel').textContent = REPS_OPTIONAL($('#form').team.value) ? 'Sales / MCP representative(s) involved (optional)' : 'Representative(s) * — tick everyone involved'; }
+  $('#repLabel').textContent = formTeams().every(REPS_OPTIONAL) ? 'Sales / MCP representative(s) involved (optional)' : 'Representative(s) * — tick everyone involved'; }
 function setRepeat(mode) {
   const fm = $('#form'); fm.repeat.value = mode;
   $('#repeatWrap').dataset.r = mode;
   fm.classList.toggle('rdates', mode === 'dates');
+  fm.classList.toggle('rmulti', !!mode);
+  if (mode) fm.end.value = '';
   $$('#rMode button').forEach(b => b.classList.toggle('on', b.dataset.r === mode));
   if (mode === 'weekly') {
     if (!$$('#dows input:checked').length && fm.start.value) $(`#dows input[value="${pd(fm.start.value).getDay()}"]`).checked = true;
@@ -1157,12 +1182,14 @@ function renderMcal() {
   const ps = [...S.picked].sort();
   $('#picked').innerHTML = ps.map(d => `<span>${fmtDate(d, { month: 'short', day: 'numeric' })}<b data-rm="${d}">×</b></span>`).join('') || '<span class="foot" style="background:none;color:var(--muted)">Tap days on the calendar to select them.</span>';
 }
+function dupKey(a) { return [a.start, [].concat(a.teams || splitReps(a.team)).slice().sort().join('|'), a.type, (a.title || '').toLowerCase(), a.startTime || '', [].concat(a.reps || []).slice().sort().join('|')].join('¦'); }
 async function save() {
+  if (S.saving) return;                       // ignore double-clicks / Enter while saving
   const fm = $('#form'), msg = $('#formMsg');
   if (fm.repeat.value === 'dates' && S.picked.size) { fm.start.value = [...S.picked].sort()[0]; fm.end.value = ''; }
   const reps = $$('#repBox input:checked').map(i => i.value);
   const it = {
-    team: fm.team.value, type: fm.type.value, title: fm.title.value.trim(), start: fm.start.value,
+    team: formTeams(), teams: formTeams(), type: fm.type.value, title: fm.title.value.trim(), start: fm.start.value,
     end: fm.end.value && fm.end.value >= fm.start.value ? fm.end.value : fm.start.value,
     startTime: fm.startTime.value, endTime: fm.endTime.value, reps,
     qty: fm.qty.value === '' ? '' : Number(fm.qty.value), unit: fm.unit.value.trim(), location: fm.location.value.trim(),
@@ -1177,7 +1204,8 @@ async function save() {
     if (!it.title) it.title = (it.leaveType || 'Rest Day') + ' – ' + reps.join(', ');
   } else {
     if (!it.title) it.title = it.type;
-    if (!reps.length && !REPS_OPTIONAL(it.team)) { msg.textContent = 'Tick at least one representative.'; return; }
+    if (!it.teams.length) { msg.textContent = 'Tick whose activity this is (one or more teams).'; return; }
+  if (!reps.length && !it.teams.every(REPS_OPTIONAL)) { msg.textContent = 'Tick at least one representative.'; return; }
     if (fm.needVeh.checked) {
       it.vehicle = fm.vehicle.value; it.route = fm.route.value.trim();
       if (!it.vehicle || !it.route) { msg.textContent = 'Choose the vehicle and enter the route.'; return; }
@@ -1186,22 +1214,34 @@ async function save() {
     }
   }
   if (!S.me) { msg.textContent = 'Pick your name at the top (“I am”) first so the sheet records who made the change.'; return; }
-  const btn = $('#saveBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin dk"></span> Saving';
+  // build the list of new entries (one per date) and skip ones that already exist
+  let items = [it];
+  if (!S.editing && fm.repeat.value) {
+    const dates = repeatDates();
+    if (!dates.length) { msg.textContent = fm.repeat.value === 'dates' ? 'Pick at least one date.' : 'Choose the days and an “until” date after the start date.'; return; }
+    if (dates.length > 120) { msg.textContent = 'That creates ' + dates.length + ' entries — use a shorter range (max 120).'; return; }
+    items = dates.map(d => Object.assign({}, it, { start: d, end: d }));
+  }
+  if (!S.editing) {
+    const have = new Set(S.acts.filter(a => a.status !== 'Cancelled').map(dupKey));
+    const dups = items.filter(x => have.has(dupKey(x)));
+    if (dups.length) {
+      const list = dups.slice(0, 6).map(x => fmtDate(x.start)).join(', ') + (dups.length > 6 ? '…' : '');
+      if (dups.length === items.length) { msg.textContent = '⚠ This activity already exists on ' + list + '. Nothing new to add.'; return; }
+      if (!confirm(`${dups.length} of these already exist (${list}).\n\nOK = add only the ${items.length - dups.length} new date(s)\nCancel = go back`)) return;
+      items = items.filter(x => !have.has(dupKey(x)));
+    }
+  }
+  const btn = $('#saveBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin dk"></span> Saving'; S.saving = true;
   try {
     let n = 1;
     if (S.editing) await api('Activities', 'update', { item: Object.assign({ id: S.editing }, it) });
-    else if (fm.repeat.value) {
-      const dates = repeatDates(), span = daysBetween(it.start, it.end);
-      if (!dates.length) throw new Error(fm.repeat.value === 'dates' ? 'Pick at least one date.' : 'Choose the days and an “until” date after the start date.');
-      if (dates.length > 120) throw new Error('That creates ' + dates.length + ' entries — use a shorter range (max 120).');
-      const items = dates.map(d => Object.assign({}, it, { start: d, end: addDays(d, fm.repeat.value === 'dates' ? 0 : span) }));
-      await api('Activities', 'add', { items }); n = items.length;
-    } else await api('Activities', 'add', { items: [it] });
+    else { await api('Activities', 'add', { items }); n = items.length; }
     hide('#formOv');
     toast(S.editing ? 'Activity updated' : n > 1 ? n + ' activities added' : 'Activity added');
     S.cursor = it.start; renderAll();
   } catch (e) { msg.textContent = '⚠ ' + e.message; }
-  btn.disabled = false; btn.textContent = 'Save';
+  S.saving = false; btn.disabled = false; btn.textContent = 'Save';
 }
 
 /* ====================== VEHICLE FORMS ====================== */
@@ -1363,12 +1403,12 @@ function demoApi(table, action, p) {
     S[key] = S[key].map(a => a.id === nw.id ? nw : a);
     demoLog('Edited', TABLE_LBL[table], nw.id, summaryOf(table, nw), ch || '(no change)');
   }
-  if (action === 'delete') {
-    const o = S[key].find(a => a.id === p.id);
-    S[key] = S[key].filter(a => a.id !== p.id);
+  if (action === 'delete') (p.ids || [p.id]).forEach(id => {
+    const o = S[key].find(a => a.id === id); if (!o) return;
+    S[key] = S[key].filter(a => a.id !== id);
     S.trash.unshift({ tid: 'T' + Math.random().toString(36).slice(2, 8), at: nowStr().slice(0, 16), by: S.me, type: TABLE_LBL[table], table, rid: o.id, summary: summaryOf(table, o), data: o });
     demoLog('Deleted', TABLE_LBL[table], o.id, summaryOf(table, o), 'Moved to Trash');
-  }
+  });
   if (table === 'Maintenance' && action !== 'delete') {
     const it = p.item || (p.items || [])[0], v = it && S.vehicles.find(x => x.plate === it.plate);
     if (v && it.odo !== '' && (v.odo === '' || Number(it.odo) > v.odo)) v.odo = Number(it.odo);
@@ -1499,7 +1539,11 @@ $('#mcal').addEventListener('click', e => {
   renderMcal(); repeatPreview(); vehToggle();
 });
 $('#picked').addEventListener('click', e => { const x = e.target.closest('[data-rm]'); if (x) { S.picked.delete(x.dataset.rm); renderMcal(); repeatPreview(); vehToggle(); } });
-$('#form').team.onchange = () => { fillTypes(); repLabel(); };
+$('#teamPick').addEventListener('change', e => {
+  if (!formTeams().length) { e.target.checked = true; }          // keep at least one team
+  $$('#teamPick label').forEach(l => l.classList.toggle('on', l.querySelector('input').checked));
+  fillTypes($('#form').type.value); repLabel();
+});
 $('#form').type.addEventListener('change', offToggle);
 ['needVeh', 'vehicle', 'start', 'end'].forEach(n => $('#form')[n].addEventListener('change', vehToggle));
 $('#tripTable').addEventListener('click', e => { const r = e.target.closest('[data-act]'); if (r) openEvent(r.dataset.act); });
@@ -1570,6 +1614,21 @@ $('#hBody').addEventListener('click', async e => {
     renderHistory();
   } catch (err) { $('#hMsg').textContent = '⚠ ' + err.message; }
 });
+$('#hDups').onclick = async () => {
+  const seen = new Map(), extra = [];
+  S.acts.slice().sort((a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt))).forEach(a => {
+    const k = dupKey(a) + '¦' + a.end; if (seen.has(k)) extra.push(a); else seen.set(k, a);
+  });
+  if (!extra.length) { $('#hMsg').textContent = '✔ No duplicate activities found.'; return; }
+  if (!S.me) { $('#hMsg').textContent = '⚠ Pick your name at the top (“I am”) first.'; return; }
+  const byType = {}; extra.forEach(a => byType[a.title] = (byType[a.title] || 0) + 1);
+  if (!confirm(`Found ${extra.length} duplicate activit${extra.length === 1 ? 'y' : 'ies'}:\n\n` + Object.entries(byType).map(([t, n]) => `• ${t}: ${n}`).join('\n') +
+    '\n\nKeep one of each and move the extras to Trash?')) return;
+  const b = $('#hDups'); b.disabled = true; b.textContent = 'Cleaning…';
+  try { await api('Activities', 'delete', { ids: extra.map(a => a.id) }); toast(extra.length + ' duplicates moved to Trash'); renderHistory(); }
+  catch (err) { $('#hMsg').textContent = '⚠ ' + err.message; }
+  b.disabled = false; b.textContent = '🧹 Remove duplicates';
+};
 $('#hEmpty').onclick = async () => {
   if (!S.trash.length) return;
   if (!S.me) { $('#hMsg').textContent = '⚠ Pick your name at the top (“I am”) first.'; return; }
