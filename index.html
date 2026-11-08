@@ -2,1624 +2,1340 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M. Montesclaros Farms, Inc. — Meat Inventory Ledger</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SML & MCP Activity Calendar</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-
-:root{
-  --bg: #18140f;
-  --bg-2: #211b14;
-  --paper: #f4ead2;
-  --paper-2: #eadfc2;
-  --ink: #2a2016;
-  --ink-soft: #6b5c47;
-  --line: #d3c19a;
-  --crimson: #a12e22;
-  --crimson-deep: #7c2118;
-  --sage: #52693f;
-  --sage-deep: #3c4d2e;
-  --gold: #b9862f;
-  --apple-green: #7cb342;
-  --c-beef: #a12e22;
-  --c-pork: #c98a5f;
-  --c-chicken: #6b8a45;
-  --c-lamb: #7c5642;
-  --radius: 3px;
-  --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
-  --font-body: 'Work Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-  --shadow: 0 10px 30px rgba(0,0,0,.35);
+:root{--brand:#1f5f3a;--brand2:#2e7d4f;--bg:#f3f5f4;--card:#fff;--line:#dde4df;--ink:#1d2a23;--muted:#6b7a72;--accent:#f2b705;--me:#d9480f;--today:#fff8e1;--red:#c92a2a;--amber:#b7791f;--green:#2b8a3e}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button,input,select,textarea{font:inherit}
+header{background:var(--brand);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}
+header .sub{font-size:12px;opacity:.8}
+.sp{flex:1}
+.ptabs{display:flex;gap:4px;background:rgba(0,0,0,.18);padding:3px;border-radius:10px}
+.ptabs button{border:0;background:transparent;color:#d8eadf;padding:7px 14px;border-radius:8px;cursor:pointer;font-weight:700}
+.ptabs button.on{background:#fff;color:var(--brand)}
+.ptabs .cnt{background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:1px 6px;margin-left:4px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{background:#eef3f0}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(.95)}
+.btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
+.btn.ghost:hover{background:rgba(255,255,255,.12)}
+.btn.danger{background:#fff;color:var(--red);border-color:#f1b4b4}
+.btn.sm{padding:4px 9px;font-size:12px}
+.whoami{display:flex;align-items:center;gap:6px;font-size:13px}
+.whoami select{border-radius:8px;border:0;padding:6px 8px;font-weight:600}
+.banner{background:#fff3bf;border-bottom:1px solid #f0d97a;padding:8px 18px;font-size:13px;display:none}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 18px;background:var(--card);border-bottom:1px solid var(--line)}
+.bar .label{font-size:20px;font-weight:700;min-width:190px;text-align:center}
+.tabs{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tabs button{border:0;background:#fff;padding:7px 14px;cursor:pointer;font-weight:600;color:var(--muted)}
+.tabs button.on{background:var(--brand);color:#fff}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 18px;background:#fafcfb;border-bottom:1px solid var(--line)}
+.filters select,.filters input[type=search]{border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fff;min-width:150px}
+.filters label.chk{display:flex;align-items:center;gap:5px;font-weight:600;font-size:13px;cursor:pointer}
+.offbox{background:#fff1f2;border:1px solid #fecdd3;border-radius:10px;padding:10px;display:grid;grid-template-columns:1fr;gap:10px}
+.vbox{background:#f1f5f9;border:1px solid #dbe3ea;border-radius:10px;padding:10px}
+.vneed{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;cursor:pointer}
+.vfields{display:none;grid-template-columns:1fr 2fr;gap:10px;margin-top:10px}
+.vbox.on .vfields{display:grid}
+#form.isoff .work{display:none}
+#form:not(.isoff) .offf{display:none}
+.warn{color:var(--red);font-weight:600}
+.trip{display:grid;grid-template-columns:86px 1fr;gap:8px;padding:6px 14px;border-top:1px solid #eef2ef;font-size:12.5px;cursor:pointer}
+.trip:hover{background:#f7faf8}
+.trip .when{font-weight:700;color:#33463b}.trip .when small{display:block;font-weight:500;color:var(--muted)}
+.trip .rt{font-weight:700}.trip .rt small{display:block;font-weight:400;color:var(--muted)}
+.trip.today{background:#fff8e1}
+.vsec{padding:8px 14px 2px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between}
+/* multi-select */
+.ms{position:relative}
+.ms>.msb{border:1px solid var(--line);border-radius:8px;padding:7px 28px 7px 10px;background:#fff;min-width:170px;max-width:240px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;font-weight:500}
+.ms>.msb::after{content:"▾";position:absolute;right:10px;top:7px;color:var(--muted)}
+.ms.act>.msb{border-color:var(--brand2);background:#eaf4ee;font-weight:700;color:var(--brand)}
+.msp{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:40;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15);width:300px;max-width:90vw}
+.ms.open .msp{display:block}
+.msp .mst{padding:8px;border-bottom:1px solid var(--line);display:flex;gap:6px}
+.msp .mst input{flex:1;border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0}
+.msp .msl{max-height:340px;overflow:auto;padding:4px 0}
+.msp .msg{padding:6px 12px 2px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:6px;cursor:pointer}
+.msp .msg.sub{padding-left:22px;text-transform:none;font-size:11.5px;color:#33463b}
+.msp label.msi{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 30px;cursor:pointer;font-size:13px}
+.msp label.msi:hover{background:#f3f7f4}
+.msp label.msi.d2{padding-left:40px}
+.msp .msi i{width:10px;height:10px;border-radius:3px;flex:none}
+.teams{display:flex;gap:6px;flex-wrap:wrap}
+.teams button{border:2px solid var(--tc);background:#fff;color:var(--tc);border-radius:999px;padding:5px 12px;font-weight:700;cursor:pointer;font-size:13px}
+.teams button.on{background:var(--tc);color:#fff}
+.legend{display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px 0}
+.legend span{font-size:12px;padding:3px 9px;border-radius:999px;cursor:pointer;border:1px solid rgba(0,0,0,.08);user-select:none}
+.legend span.off{opacity:.3}
+.legend span.sel{outline:2px solid var(--ink)}
+main{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:14px 18px 30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px}
+/* month */
+table.month{width:100%;border-collapse:collapse;table-layout:fixed}
+table.month th{background:#e9efeb;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:8px 4px;color:#33463b;border:1px solid var(--line)}
+table.month th.wk{width:92px;background:var(--brand2);color:#fff}
+table.month td{border:1px solid var(--line);vertical-align:top;height:118px;padding:3px;cursor:pointer}
+table.month td:hover{background:#f7faf8}
+table.month td.out{background:#f6f7f7;color:#a5b0aa}
+table.month td.out .chip{opacity:.55}
+table.month td.today{background:var(--today)}
+table.month td.today .dn{background:var(--brand);color:#fff;border-radius:999px;padding:0 7px}
+table.month td.wk{background:#f1f6f3;cursor:default;text-align:right;font-size:12px;color:#33463b;padding:6px}
+table.month td.wk b{font-size:17px;color:var(--brand)}
+.dn{font-weight:700;font-size:13px;display:inline-block;margin:1px 2px 3px}
+.chip{display:block;font-size:11.5px;line-height:1.3;padding:2px 5px;border-radius:5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:4px solid var(--tc,#999);color:#1d2a23}
+.chip.mine,.ev.mine .t{font-weight:700}
+.chip.mine::before,.ev.mine .t::before{content:"★ ";color:var(--me)}
+.chip.cancelled,.ev.cancelled .t{text-decoration:line-through;opacity:.6}
+.chip.overdue,.ev.overdue{outline:1.5px solid var(--red)}
+.more{font-size:11px;color:var(--brand2);font-weight:700;padding:0 4px}
+/* week */
+.week{display:grid;grid-template-columns:repeat(7,1fr)}
+.week .col{border-right:1px solid var(--line);min-height:420px}
+.week .col:last-child{border-right:0}
+.week .hd{padding:8px;border-bottom:1px solid var(--line);background:#e9efeb;text-align:center;cursor:pointer}
+.week .hd.today{background:var(--brand);color:#fff}
+.week .hd b{display:block;font-size:20px}
+.week .body{padding:6px;display:flex;flex-direction:column;gap:6px}
+.ev{border-radius:8px;padding:7px 8px;font-size:12.5px;cursor:pointer;border-left:5px solid var(--tc,#999)}
+.ev .t{font-weight:700}
+.ev .m{color:#3c4a42;font-size:11.5px;margin-top:2px}
+/* list */
+.list .day{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--line)}
+.list .day:last-child{border-bottom:0}
+.list .dl{padding:12px;font-weight:700;color:#33463b;background:#f6f9f7}
+.list .dl small{display:block;color:var(--muted);font-weight:600}
+.list .day.today .dl{background:var(--brand);color:#fff}
+.list .day.today .dl small{color:#d8eadf}
+.list .items{padding:8px;display:flex;flex-direction:column;gap:6px}
+.list .ev{display:grid;grid-template-columns:80px 1fr auto;gap:10px;align-items:center}
+.badge{font-size:11px;padding:2px 8px;border-radius:999px;background:#eef2ef;color:#33463b;font-weight:700;white-space:nowrap}
+.badge.Done,.badge.ok,.badge.Active{background:#d3f9d8;color:var(--green)}
+.badge.Cancelled,.badge.Overdue,.badge.overdue,.badge.Inactive{background:#ffe3e3;color:var(--red)}
+.badge.Postponed,.badge.Due,.badge.soon,.badge.Under{background:#fff3bf;color:var(--amber)}
+.badge.Scheduled,.badge.sched{background:#e7f0ff;color:#1c4fbf}
+.tag{font-size:10.5px;font-weight:700;color:#fff;background:var(--tc);border-radius:4px;padding:1px 5px;margin-right:4px}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+/* aside */
+aside{display:flex;flex-direction:column;gap:14px}
+aside .card{padding:12px 14px}
+aside h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#33463b}
+.mini{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);cursor:pointer;font-size:13px}
+.mini:last-child{border-bottom:0}
+.mini .dot{width:10px;height:10px;border-radius:3px;margin-top:4px;flex:none;border-left:3px solid var(--tc,#999)}
+.mini .badge{align-self:flex-start;flex:none;margin-top:2px}
+.mini small{display:block;color:var(--muted);font-size:11.5px}
+.statrow{display:flex;justify-content:space-between;font-size:12.5px;margin:6px 0 2px}
+.track{height:7px;background:#eef2ef;border-radius:99px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:#f3f7f4;border-radius:10px;padding:8px 10px}
+.kpi b{display:block;font-size:22px;color:var(--brand)}
+.kpi span{font-size:11.5px;color:var(--muted)}
+.kpi.red b{color:var(--red)}.kpi.amber b{color:var(--amber)}
+.foot{font-size:11.5px;color:var(--muted)}
+/* vehicles */
+.vwrap{padding:14px 18px 30px;display:flex;flex-direction:column;gap:16px}
+.vkpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.vkpis .kpi{background:#fff;border:1px solid var(--line)}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.vcard{background:#fff;border:1px solid var(--line);border-radius:12px;border-top:5px solid var(--green);display:flex;flex-direction:column}
+.vcard.soon{border-top-color:#f2b705}.vcard.overdue{border-top-color:var(--red)}.vcard.inactive{opacity:.6;border-top-color:#adb5bd}
+.vcard .vh{padding:12px 14px 6px;display:flex;gap:10px;align-items:flex-start}
+.vcard .vh b{font-size:15px}
+.vcard .vh small{display:block;color:var(--muted);font-size:12px}
+.vcard .odo{padding:0 14px 8px;font-size:13px;color:#33463b;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.vcard .odo b{font-size:18px;color:var(--ink)}
+.vcard table{width:100%;border-collapse:collapse;font-size:12.5px}
+.vcard td{padding:6px 14px;border-top:1px solid #eef2ef;vertical-align:top}
+.vcard td small{display:block;color:var(--muted);font-size:11px}
+.vcard tr.click{cursor:pointer}.vcard tr.click:hover{background:#f7faf8}
+.vcard .vf{padding:10px 14px;margin-top:auto;border-top:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap}
+.vcard .norec{padding:6px 14px;font-size:11.5px;color:var(--muted);border-top:1px solid #eef2ef}
+table.log{width:100%;border-collapse:collapse;font-size:13px}
+table.log th{background:#e9efeb;text-align:left;padding:8px 10px;font-size:12px;color:#33463b;position:sticky;top:0}
+table.log td{padding:8px 10px;border-top:1px solid var(--line)}
+table.log tbody tr{cursor:pointer}table.log tbody tr:hover{background:#f7faf8}
+table.log td.num,table.log th.num{text-align:right}
+table.log tfoot td{font-weight:700;background:#f6f9f7}
+.sect{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sect h2{margin:0;font-size:16px;flex:1}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(20,30,25,.45);display:none;align-items:flex-start;justify-content:center;padding:30px 12px;overflow:auto;z-index:50}
+.ov.show{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:640px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal .mh{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.modal .mh h2{margin:0;font-size:17px;flex:1}
+.modal .mb{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal .mf{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.f{display:flex;flex-direction:column;gap:4px}
+.f.full{grid-column:1/-1}
+.f label{font-size:12px;font-weight:700;color:#33463b}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:8px;padding:8px 9px;width:100%}
+.f input[type=checkbox]{width:auto;padding:0;margin:0}
+.f input[readonly]{background:#f3f5f4}
+.f textarea{min-height:60px;resize:vertical}
+.f .hint{font-size:11.5px;color:var(--muted)}
+.reps{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px}
+.reps .grp{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
+.reps .row{display:flex;flex-wrap:wrap;gap:6px}
+.reps label{display:flex;align-items:center;gap:4px;font-size:13px;background:#f3f7f4;padding:3px 8px;border-radius:999px;cursor:pointer;font-weight:500}
+.dows{display:flex;gap:4px;flex-wrap:wrap}
+.dows label{display:flex;align-items:center;gap:3px;font-size:12.5px;background:#f3f7f4;padding:3px 7px;border-radius:6px}
+.detail{padding:16px 18px}
+.detail .row{display:grid;grid-template-columns:130px 1fr;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.detail .row span:first-child{color:var(--muted);font-weight:600}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1d2a23;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;display:none;z-index:60}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 1s linear infinite;vertical-align:-2px}
+.spin.dk{border-color:rgba(0,0,0,.2);border-top-color:#000}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+@media (max-width:1100px){.vkpis{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:1000px){main{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .bar .label{min-width:auto;font-size:17px;flex-basis:100%;text-align:left;order:-1}
+  .filters select,.filters input[type=search]{min-width:0;flex:1 1 45%}
+  .modal .mb{grid-template-columns:1fr}
+  .list .day{grid-template-columns:1fr}
+  .list .ev{grid-template-columns:62px 1fr}
+  .list .ev .badge{display:none}
+  .week{grid-template-columns:1fr}.week .col{min-height:0;border-right:0;border-bottom:1px solid var(--line)}
+  table.month td{height:70px}.chip{font-size:10px}
+  .vkpis{grid-template-columns:repeat(2,1fr)}.vgrid{grid-template-columns:1fr}
+  .logwrap{overflow-x:auto}
 }
-
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;}
-body{
-  background:
-    radial-gradient(1200px 600px at 15% -10%, #23261f 0%, transparent 60%),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 3px),
-    var(--bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  min-height: 100vh;
-  padding: 22px 16px 60px;
+@media print{
+  header .btn,header .whoami,.bar .btn,.tabs,.filters,aside,.banner,.vcard .vf,.sect .btn{display:none!important}
+  main{grid-template-columns:1fr;padding:0}
+  body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table.month td{height:95px}
 }
-
-.app{ max-width: 1760px; margin: 0 auto; }
-
-/* ===== Header / signboard ===== */
-.board{
-  background: linear-gradient(180deg, var(--bg-2), #16120d);
-  border: 1px solid #362c1f;
-  border-radius: 6px;
-  padding: 22px 26px;
-  margin-bottom: 22px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-.board::after{
-  content:"";
-  position:absolute; inset:0;
-  background: repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px);
-  pointer-events:none;
-}
-.board-inner{
-  display:flex; align-items:center; justify-content:space-between; gap: 20px; flex-wrap: wrap;
-  position: relative; z-index:1;
-}
-.brand{ display:flex; align-items:center; gap:16px; }
-.brand h1{
-  font-family: var(--font-display);
-  font-size: 30px;
-  letter-spacing: 1px;
-  color: var(--apple-green);
-  margin:0; line-height:1.05;
-}
-.brand p{
-  margin: 4px 0 0;
-  color: #ffffff;
-  font-size: 13px;
-  letter-spacing: .5px;
-}
-.brand p.brand-sub{
-  margin-top: 2px;
-  color: #cfead4;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  opacity: .85;
-}
-.board-meta{ text-align:right; }
-#clock{
-  font-family: var(--font-mono);
-  color: var(--paper);
-  font-size: 14px;
-  letter-spacing: .5px;
-  opacity: .85;
-}
-.board-meta .sub{ color:#ffffff; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; margin-top:3px;}
-.signed-in-badge{
-  margin-top: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(124,179,66,.14);
-  border: 1px solid var(--apple-green);
-  border-radius: 3px;
-  padding: 4px 10px;
-  font-size: 11px;
-}
-.signed-in-badge #signedInText{
-  color: var(--apple-green);
-  font-weight: 700;
-  letter-spacing: .3px;
-}
-.signed-in-badge.empty #signedInText{ color: #a89877; font-weight:500; }
-.signed-in-badge.empty{ border-color: #4a3f2e; background: rgba(255,255,255,.03); }
-.signed-in-badge button{
-  background: none; border: none; color: #cfead4; text-decoration: underline;
-  font-size: 10px; padding: 0; cursor: pointer;
-}
-
-/* ===== Stats strip ===== */
-.stats{
-  display:grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.stat-card{
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 8px 12px;
-  position: relative;
-  box-shadow: var(--shadow);
-}
-.stat-card::before{
-  content:"";
-  position:absolute; left:0; top:0; bottom:0; width:4px;
-  background: var(--accent, var(--gold));
-  border-radius: var(--radius) 0 0 var(--radius);
-}
-.stat-label{
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--ink-soft);
-  margin: 0 0 3px;
-  font-weight: 600;
-}
-.stat-value{
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--ink);
-}
-.stat-value small{ font-size: 11px; font-weight:500; color: var(--ink-soft); }
-.stat-sub{ font-size:10px; color: var(--ink-soft); margin-top:3px; }
-.stat-card.warn .stat-value{ color: var(--crimson); }
-.stat-card.warn::before{ background: var(--crimson); }
-
-/* ===== Layout ===== */
-.grid-main{
-  display:grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 18px;
-  align-items:stretch;
-  margin-bottom: 18px;
-}
-.panel{
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 18px 20px 20px;
-  box-shadow: var(--shadow);
-}
-.panel-head{
-  display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 12px; flex-wrap:wrap;
-}
-.panel h2{
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 1.2px;
-  margin: 0 0 12px;
-  color: var(--ink);
-  border-bottom: 2px solid var(--ink);
-  padding-bottom: 6px;
-}
-.panel-head h2{ margin-bottom:0; border-bottom:none; padding-bottom:0;}
-
-button, .btn{
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 13px;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
-  padding: 9px 14px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  letter-spacing: .3px;
-  transition: transform .12s ease, background .15s ease;
-}
-button:hover{ background: #3a2c1c; }
-button:active{ transform: translateY(1px); }
-button.ghost{
-  background: transparent; color: var(--ink); border: 1px solid var(--ink-soft);
-}
-button.ghost:hover{ background: rgba(0,0,0,.05); }
-
-/* ===== Controls ===== */
-.controls{
-  display:flex; gap:8px; margin-bottom: 14px; flex-wrap: wrap;
-}
-.controls input, .controls select, select, input[type=text], input[type=number]{
-  font-family: var(--font-body);
-  font-size: 13px;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  background: #fffdf7;
-  border-radius: var(--radius);
-  color: var(--ink);
-}
-.controls input#search{ flex: 1 1 160px; min-width: 140px; }
-.controls select{ flex: 0 0 auto; }
-
-/* ===== Tag grid (inventory cards) ===== */
-.inventory-panel, .movement-panel, .log-panel{
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.movement-panel form{
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-.tag-grid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: minmax(170px, auto);
-  gap: 14px;
-  flex: 0 0 auto;
-  height: calc(170px * 5 + 14px * 4 + 10px); /* 5 card rows + gaps + top padding */
-  overflow-y: auto;
-  padding-right: 6px;
-  padding-top: 10px; /* room for the hanging-tag hole so it isn't clipped */
-}
-#inventoryPanel.viewer-mode .tag-grid{
-  grid-template-columns: repeat(6, 1fr);
-}
-.tag-card{
-  position: relative;
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  padding: 14px 14px 12px;
-  min-height: 170px;
-  display: flex;
-  flex-direction: column;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.tag-card:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.18); }
-.tag-card.flash{ animation: flash 900ms ease; }
-@keyframes flash{
-  0%{ box-shadow: 0 0 0 2px var(--gold); }
-  100%{ box-shadow: none; }
-}
-.tag-hole{
-  position:absolute; top: -7px; left: 18px;
-  width: 14px; height: 14px;
-  background: var(--bg);
-  border-radius: 50%;
-  border: 3px solid var(--paper-2);
-}
-.tag-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-.tag-cat{
-  display:inline-block;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--cat-color, var(--gold));
-  padding: 2px 7px;
-  border-radius: 2px;
-  margin-bottom: 6px;
-}
-.tag-name{
-  font-family: var(--font-display);
-  font-size: 21px;
-  letter-spacing: .5px;
-  margin: 0 0 2px;
-  line-height:1.05;
-}
-.tag-actions{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
-.tag-edit{
-  background:none; border: 1px solid var(--ink-soft); color: var(--ink-soft);
-  font-size: 10px; text-transform: uppercase; letter-spacing: .5px; font-weight:700;
-  padding: 3px 8px; border-radius: 2px;
-}
-.tag-edit:hover{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.tag-remove{
-  background:none; border:none; color: var(--ink-soft); font-size:16px; padding:0 2px; cursor:pointer; border-radius:2px; line-height:1;
-}
-.tag-remove:hover{ color: var(--crimson); background:none; }
-.tag-remove.confirming{ color:#fff; background:var(--crimson); padding:2px 6px; font-size:11px; }
-
-.tag-stock-label{
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--ink-soft);
-  font-weight: 700;
-  margin-top: 8px;
-}
-.tag-stock{
-  font-family: var(--font-mono);
-  font-size: 22px;
-  font-weight:700;
-  margin: 2px 0 2px;
-}
-.tag-stock small{ font-size:12px; font-weight:500; color: var(--ink-soft); }
-.tag-inout{
-  display: flex;
-  gap: 12px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  margin: 4px 0 2px;
-}
-.tag-inout .in{ color: var(--sage-deep); }
-.tag-inout .out{ color: var(--crimson-deep); }
-
-.gauge{
-  height: 7px; background: rgba(0,0,0,.08); border-radius: 4px; overflow:hidden; margin: 8px 0 6px;
-}
-.gauge-fill{
-  height:100%; border-radius:4px; width:0%;
-  background: var(--sage);
-  transition: width .6s cubic-bezier(.2,.8,.2,1);
-}
-.gauge-fill.watch{ background: var(--gold); }
-.gauge-fill.low{ background: var(--crimson); }
-
-.tag-foot{
-  display:flex; justify-content:space-between; font-size: 11px; color: var(--ink-soft);
-}
-.tag-status{ font-weight:700; letter-spacing:.3px; }
-.tag-status.low{ color: var(--crimson); }
-.tag-status.watch{ color: #8a6414; }
-.tag-status.ok{ color: var(--sage-deep); }
-
-/* ===== Movement panel ===== */
-.type-toggle{ display:flex; gap:8px; margin-bottom: 12px; }
-
-.cart-builder{
-  border: 1px dashed var(--line);
-  border-radius: 3px;
-  padding: 12px;
-  margin: 14px 0 10px;
-  background: #fffdf7;
-}
-.cart-builder-label{
-  font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
-  color: var(--ink-soft); margin-bottom: 10px;
-}
-.cart-list{ display:flex; flex-direction:column; gap:8px; margin-bottom: 10px; flex: 1; overflow-y:auto; min-height: 40px; }
-.cart-item{
-  display:flex; align-items:center; gap:8px;
-  border: 1px solid var(--line); border-radius: 2px; padding: 8px 10px;
-  background: var(--paper-2); font-size: 12.5px;
-}
-.cart-item .cart-dir{
-  flex-shrink:0; width: 30px; height: 22px; border-radius: 2px;
-  display:flex; align-items:center; justify-content:center;
-  font-size: 10px; font-weight: 700; color: #fff;
-}
-.cart-item .cart-dir.in{ background: var(--sage); }
-.cart-item .cart-dir.out{ background: var(--crimson); }
-.cart-item .cart-body{ flex:1; min-width:0; }
-.cart-item .cart-name{ font-weight: 700; }
-.cart-item .cart-meta{ color: var(--ink-soft); font-size: 11px; }
-.cart-item .cart-remove{
-  background:none; border:none; color: var(--ink-soft); font-size: 16px; cursor:pointer; padding: 0 2px; line-height:1;
-}
-.cart-item .cart-remove:hover{ color: var(--crimson); }
-.cart-empty-note{ font-size: 12px; color: var(--ink-soft); padding: 4px 2px; }
-.type-toggle button{
-  flex:1; background: transparent; color: var(--ink); border: 1px solid var(--ink-soft);
-}
-.type-toggle button.active[data-type="in"]{ background: var(--sage); border-color: var(--sage); color:#fff; }
-.type-toggle button.active[data-type="out"]{ background: var(--crimson); border-color: var(--crimson); color:#fff; }
-
-.field{ margin-bottom: 10px; }
-.field label{ display:block; font-size: 11px; text-transform:uppercase; letter-spacing:1px; color: var(--ink-soft); margin-bottom:4px; font-weight:600;}
-.field select, .field input, .field textarea{ width: 100%; }
-.field textarea{ resize: vertical; min-height: 46px; font-family: var(--font-body); font-size:13px; padding:8px 10px; border:1px solid var(--line); border-radius: var(--radius); background:#fffdf7; }
-.qty-row{ display:flex; gap:8px; align-items:center; }
-.qty-row input{ flex:1; }
-.qty-unit{ font-family: var(--font-mono); font-size:13px; color: var(--ink-soft); min-width: 28px; }
-.form-error{ font-size:12px; color: var(--crimson); margin: -4px 0 10px; display:none; }
-.form-error.show{ display:block; }
-.submit-row{ margin-top: 4px; }
-.submit-row button{ width:100%; }
-
-/* ===== Activity ticket log ===== */
-.ticket-log{ flex: 1; min-height: 150px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:2px;}
-.ticket{
-  border: 1px dashed var(--line);
-  border-radius: 2px;
-  padding: 9px 10px;
-  background: #fffdf7;
-  display:flex; align-items:center; gap:10px;
-  font-size: 12.5px;
-}
-.stamp{
-  flex-shrink:0;
-  width:34px; height:34px; border-radius:50%;
-  border: 2px solid var(--sage);
-  color: var(--sage);
-  display:flex; align-items:center; justify-content:center;
-  font-family: var(--font-display);
-  font-size: 9px;
-  letter-spacing:.5px;
-  transform: rotate(-8deg);
-  text-align:center;
-  line-height:1;
-}
-.stamp.out{ border-color: var(--crimson); color: var(--crimson); transform: rotate(7deg); }
-.ticket-body{ flex:1; min-width:0; }
-.ticket-title{ font-weight:700; }
-.ticket-meta{ color: var(--ink-soft); font-size:11px; }
-.ticket-qty{ font-family: var(--font-mono); font-weight:700; white-space:nowrap; }
-.ticket-qty.in{ color: var(--sage-deep); }
-.ticket-qty.out{ color: var(--crimson-deep); }
-.empty-note{ color: var(--ink-soft); font-size: 12.5px; padding: 6px 2px; }
-
-/* ===== Sheet sync panel ===== */
-.log-actions{ display:flex; gap:6px; }
-.log-actions button{ font-size:11px; padding:6px 9px; }
-.sync-panel{
-  display:none;
-  border: 1px dashed var(--line);
-  border-radius: 3px;
-  padding: 12px;
-  margin-bottom: 12px;
-  background: #fffdf7;
-}
-.sync-panel.show{ display:block; }
-.sync-panel p{ font-size:12px; color: var(--ink-soft); margin: 0 0 8px; line-height:1.5; }
-.sync-panel .field{ margin-bottom: 8px; }
-.sync-status{ font-size:11px; margin-top:6px; font-weight:600; }
-.sync-status.on{ color: var(--sage-deep); }
-.sync-status.off{ color: var(--ink-soft); }
-.sync-code{
-  width:100%; font-family: var(--font-mono); font-size:10.5px; line-height:1.5;
-  min-height: 130px; background: var(--ink); color: #e8dcc0; border-radius:3px; border:none; padding:10px;
-  resize: vertical;
-}
-.sync-actions{ display:flex; gap:6px; margin-top:8px; }
-.sync-actions button{ flex:1; font-size:11px; padding:7px; }
-
-/* ===== Chart panel ===== */
-.chart-rows{ display:flex; flex-direction:column; gap:5px; }
-.chart-panel{ margin-bottom: 12px; padding: 10px 16px 12px; }
-.chart-panel h2{ font-size: 16px; margin-bottom: 6px; padding-bottom: 3px; }
-.chart-row{ display:grid; grid-template-columns: 130px 1fr 70px; align-items:center; gap:10px; }
-.chart-row .name{ font-size:13px; font-weight:600; }
-.chart-track{ height: 8px; background: rgba(0,0,0,.06); border-radius:3px; overflow:hidden; }
-.chart-bar{ height:100%; width:0%; border-radius:3px; transition: width .8s cubic-bezier(.2,.8,.2,1); }
-.chart-row .val{ font-family: var(--font-mono); font-size:12px; text-align:right; }
-
-/* ===== Modal ===== */
-.modal-overlay{
-  position: fixed; inset:0; background: rgba(15,12,8,.6);
-  display:none; align-items:center; justify-content:center; z-index: 50; padding: 16px;
-}
-.modal-overlay.show{ display:flex; }
-.modal{
-  background: var(--paper); border-radius: 4px; padding: 22px 24px; width: 100%; max-width: 420px;
-  box-shadow: var(--shadow); border: 1px solid var(--line);
-}
-.modal h2{ font-family: var(--font-display); font-size:24px; letter-spacing:1px; margin:0 0 14px; }
-.modal-actions{ display:flex; gap:8px; margin-top: 6px; }
-.modal-actions button{ flex:1; }
-
-/* ===== Login gate (blocks the dashboard until signed in) ===== */
-.login-gate{
-  position: fixed; inset:0; z-index: 500;
-  background:
-    radial-gradient(1200px 600px at 15% -10%, #23261f 0%, transparent 60%),
-    var(--bg);
-  display:flex; align-items:center; justify-content:center; padding: 16px;
-}
-.login-card{ max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
-.login-card h2{ color: var(--apple-green); }
-
-/* ===== Toast stamp overlay ===== */
-#stampLayer{ position: fixed; top: 18px; right: 18px; display:flex; flex-direction:column; gap:8px; z-index: 60; pointer-events:none; }
-.toast{
-  font-family: var(--font-mono);
-  background: var(--ink); color: var(--paper);
-  padding: 10px 14px; border-radius: 3px; font-size: 12.5px;
-  box-shadow: var(--shadow);
-  border-left: 4px solid var(--sage);
-  animation: toastIn .35s ease, toastOut .4s ease 2.2s forwards;
-}
-.toast.out{ border-left-color: var(--crimson); }
-@keyframes toastIn{ from{ opacity:0; transform: translateX(20px) rotate(-2deg);} to{ opacity:1; transform: translateX(0) rotate(0);} }
-@keyframes toastOut{ to{ opacity:0; transform: translateX(20px);} }
-
-/* ===== Responsive ===== */
-@media (max-width: 980px){
-  .grid-main{ grid-template-columns: 1fr; }
-  .stats{ grid-template-columns: repeat(3, 1fr); }
-  .tag-grid{ grid-template-columns: repeat(3, 1fr); }
-  #inventoryPanel.viewer-mode .tag-grid{ grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 640px){
-  body{ padding: 14px 10px 40px; }
-  .brand h1{ font-size: 21px; }
-  .tag-grid{ grid-template-columns: repeat(2, 1fr); }
-  #inventoryPanel.viewer-mode .tag-grid{ grid-template-columns: repeat(2, 1fr); }
-  .board-inner{ flex-direction:column; align-items:flex-start; }
-  .board-meta{ text-align:left; }
-  .chart-row{ grid-template-columns: 90px 1fr 56px; }
-  .stats{ grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 420px){
-  .tag-grid{ grid-template-columns: 1fr; }
-  #inventoryPanel.viewer-mode .tag-grid{ grid-template-columns: 1fr; }
-}
-::-webkit-scrollbar{ width:8px; }
-::-webkit-scrollbar-thumb{ background: var(--line); border-radius: 4px; }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <header class="board">
-    <div class="board-inner">
-      <div class="brand">
-        <div>
-          <h1>M. Montesclaros Farms, Inc.</h1>
-          <p>Sales Meat and Livestock — Meat Cutting Plant</p>
-          <p class="brand-sub">Cold Storage Inventory and Movement Log</p>
-        </div>
-      </div>
-      <div class="board-meta">
-        <div id="clock">—</div>
-        <div class="sub">Sayre Highway, Valencia City</div>
-        <div class="signed-in-badge" id="signedInBadge">
-          <span id="signedInText">Not signed in</span>
-          <button type="button" id="switchUserBtn" style="display:none;">Switch</button>
-        </div>
-      </div>
+<header>
+  <div>
+    <h1>SML &amp; MCP Activity Calendar</h1>
+    <div class="sub">Sales Meat &amp; Livestock · Meat Cutting Plant · Slaughterhouse · Growing · Vehicles</div>
+  </div>
+  <div class="ptabs" id="pageTabs">
+    <button data-p="cal">📅 Calendar</button>
+    <button data-p="veh">🚚 Vehicles <span class="cnt hidden" id="vAlert"></span></button>
+  </div>
+  <div class="sp"></div>
+  <div class="whoami">I am <select id="meSel" title="Pick your name to highlight your activities"></select></div>
+  <button class="btn ghost" id="refreshBtn" title="Reload from Google Sheet">⟳ Refresh</button>
+  <button class="btn ghost" id="printBtn" title="Print">🖨</button>
+  <button class="btn ghost" id="settingsBtn" title="Settings">⚙</button>
+  <button class="btn primary" id="addBtn">＋ Add activity</button>
+</header>
+<div class="banner" id="banner"></div>
+
+<!-- ===================== CALENDAR PAGE ===================== -->
+<div id="pageCal">
+  <div class="bar">
+    <button class="btn" id="prevBtn">‹</button>
+    <button class="btn" id="todayBtn">Today</button>
+    <button class="btn" id="nextBtn">›</button>
+    <div class="label" id="rangeLabel"></div>
+    <div class="sp"></div>
+    <div class="tabs" id="viewTabs">
+      <button data-v="month">Month</button><button data-v="week">Week</button><button data-v="list">List</button>
     </div>
-  </header>
-
-  <section class="stats" id="stats"></section>
-
-  <section class="panel chart-panel">
-    <h2>Stock by category</h2>
-    <div class="chart-rows" id="categoryChart"></div>
-  </section>
-
-  <main class="grid-main">
-    <section class="panel inventory-panel" id="inventoryPanel">
-      <div class="panel-head">
-        <h2>Inventory</h2>
-        <button id="openAddItem">+ New cut</button>
-      </div>
-      <div class="controls">
-        <input id="search" type="text" placeholder="Search cuts…">
-        <select id="categoryFilter">
-          <option value="all">All categories</option>
-          <option value="pork">Pork</option>
-          <option value="beef">Beef</option>
-          <option value="chicken">Chicken</option>
-          <option value="lamb">Lamb</option>
-        </select>
-        <select id="sortBy">
-          <option value="name">Sort: Name</option>
-          <option value="stockLow">Sort: Lowest stock</option>
-          <option value="stockHigh">Sort: Highest stock</option>
-        </select>
-      </div>
-      <div class="tag-grid" id="tagGrid"></div>
-    </section>
-
-    <section class="panel movement-panel" id="movementPanelSection">
-      <h2>Record movement</h2>
-        <div class="empty-note" id="moveViewOnly" style="display:none;">You're signed in as a Viewer — recording stock movements requires an Administrator or Stockman role.</div>
-        <form id="movementForm">
-          <div class="field">
-            <label for="moveRef">Reference # <span style="color:var(--crimson)">*</span></label>
-            <input id="moveRef" type="text" placeholder="e.g. PO-1042, INV-338, ticket #12" required>
-          </div>
-          <div class="field">
-            <label for="moveBatch">Batch Code / Production Date <span style="color:var(--crimson)">*</span></label>
-            <input id="moveBatch" type="text" placeholder="e.g. BC-0731 or 2026-07-31" required>
-          </div>
-          <div class="field">
-            <label for="moveStockman">Stockman In-charge <span style="color:var(--crimson)">*</span></label>
-            <input id="moveStockman" type="text" placeholder="Full name" required>
-          </div>
-          <div class="field">
-            <label for="moveLocation">Location <span style="color:var(--crimson)">*</span></label>
-            <input id="moveLocation" type="text" placeholder="e.g. Cold Storage 1, Cutting Room" required>
-          </div>
-          <div class="field">
-            <label for="moveNote">Note (optional)</label>
-            <textarea id="moveNote" placeholder="e.g. supplier, order #, ticket ref…"></textarea>
-          </div>
-
-          <div class="cart-builder">
-            <div class="cart-builder-label">Add items to this transaction</div>
-            <div class="type-toggle">
-              <button type="button" class="active" data-type="in">↓ Stock In</button>
-              <button type="button" data-type="out">↑ Stock Out</button>
-            </div>
-            <div class="field">
-              <label for="moveItem">Cut</label>
-              <input id="moveItem" type="text" list="cutsList" placeholder="Type to search a cut…" autocomplete="off">
-              <datalist id="cutsList"></datalist>
-            </div>
-            <div class="field">
-              <label for="moveQty">Quantity</label>
-              <div class="qty-row">
-                <input id="moveQty" type="number" min="0.001" step="0.001" placeholder="0.000">
-                <span class="qty-unit" id="moveUnit">kg</span>
-              </div>
-            </div>
-            <div class="field">
-              <label for="moveReason">Reason</label>
-              <select id="moveReason"></select>
-            </div>
-            <div class="form-error" id="lineError">Enter a valid quantity.</div>
-            <button type="button" class="ghost" id="addToCartBtn" style="width:100%;">+ Add to cart</button>
-          </div>
-
-          <div class="cart-list" id="cartList"></div>
-
-          <div class="form-error" id="moveError">Enter a valid quantity.</div>
-          <div class="submit-row">
-            <button type="submit" id="recordAllBtn">Record All (0)</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="panel log-panel" id="logPanelSection">
-        <div class="panel-head">
-          <h2>Activity</h2>
-          <div class="log-actions">
-            <button type="button" class="ghost" id="exportCsv">Export CSV</button>
-          </div>
-        </div>
-        <div class="sync-status off" id="syncStatus">Auto-syncing every movement to your Google Sheet.</div>
-        <div class="ticket-log" id="ticketLog"></div>
-      </section>
+  </div>
+  <div class="filters">
+    <div class="teams" id="teamPills" title="Whose activity"></div>
+    <div class="ms" id="fRep"></div>
+    <div class="ms" id="fSec"></div>
+    <div class="ms" id="fType"></div>
+    <div class="ms" id="fStatus"></div>
+    <input type="search" id="fQ" placeholder="Search title, notes, location…">
+    <label class="chk"><input type="checkbox" id="fMine"> Mine only</label>
+    <button class="btn sm" id="clearBtn">Clear</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <main>
+    <section class="card" id="view" style="overflow:hidden"></section>
+    <aside>
+      <div class="card"><h3 id="kpiTitle">This month</h3><div class="kpis" id="kpis"></div></div>
+      <div class="card"><h3>Team today</h3><div id="todayList"></div></div>
+      <div class="card"><h3>🏖 Off today (rest day / leave)</h3><div id="offList"></div></div>
+      <div class="card"><h3 id="myTitle">My next 14 days</h3><div id="myList"></div></div>
+      <div class="card"><h3>Vehicle alerts</h3><div id="vAlerts"></div></div>
+      <div class="card"><h3>By activity (filtered)</h3><div id="byType"></div></div>
+      <div class="foot" id="syncInfo"></div>
+    </aside>
   </main>
 </div>
 
-<div class="modal-overlay" id="modalOverlay">
+<!-- ===================== VEHICLES PAGE ===================== -->
+<div id="pageVeh" class="hidden">
+  <div class="filters">
+    <select id="vfVeh"></select>
+    <select id="vfSvc"></select>
+    <select id="vfStatus"><option value="">All status</option><option>Scheduled</option><option>Done</option><option>Cancelled</option></select>
+    <select id="vfYear"></select>
+    <button class="btn sm" id="vClear">Clear</button>
+    <div class="sp"></div>
+    <button class="btn" id="addVehBtn">＋ Add vehicle</button>
+  </div>
+  <div class="vwrap">
+    <div class="vkpis" id="vkpis"></div>
+    <div class="vgrid" id="vgrid"></div>
+    <div class="card">
+      <div class="sect" style="padding:12px 14px"><h2>🗺 Vehicle schedule &amp; routes</h2>
+        <select id="tripRange" style="border:1px solid var(--line);border-radius:8px;padding:6px 8px"><option value="7">Next 7 days</option><option value="14" selected>Next 14 days</option><option value="31">Next 31 days</option><option value="past">Past 31 days</option></select>
+        <span class="foot" id="tripCount"></span></div>
+      <div class="logwrap"><table class="log" id="tripTable"></table></div>
+    </div>
+    <div class="card">
+      <div class="sect" style="padding:12px 14px"><h2>🔧 Maintenance log</h2><span class="foot" id="logCount"></span></div>
+      <div class="logwrap"><table class="log" id="logTable"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- activity form -->
+<div class="ov" id="formOv">
   <div class="modal">
-    <h2 id="modalTitle">Add new cut</h2>
-    <form id="addItemForm">
-      <input type="hidden" id="editItemId" value="">
-      <div class="field">
-        <label for="newName">Name</label>
-        <input id="newName" type="text" placeholder="e.g. Flank Steak" required>
-      </div>
-      <div class="field">
-        <label for="newCategory">Category</label>
-        <select id="newCategory">
-          <option value="pork">Pork</option>
-          <option value="beef">Beef</option>
-          <option value="chicken">Chicken</option>
-          <option value="lamb">Lamb</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="newUnit">Unit</label>
-        <select id="newUnit">
-          <option value="kg">Kilograms (kg)</option>
-          <option value="lb">Pounds (lb)</option>
-          <option value="pcs">Pieces (pcs)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="newStock" id="newStockLabel">Starting stock</label>
-        <input id="newStock" type="number" min="0" step="0.001" value="0">
-      </div>
-      <div class="field">
-        <label for="newReorder">Reorder level</label>
-        <input id="newReorder" type="number" min="0" step="0.1" value="5">
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="ghost" id="cancelAddItem">Cancel</button>
-        <button type="submit" id="modalSubmitBtn">Add cut</button>
+    <div class="mh"><h2 id="formTitle">Add activity</h2><button class="btn sm" data-close>✕</button></div>
+    <form id="form" class="mb" autocomplete="off">
+      <div class="f"><label>Whose activity? *</label><select name="team" required></select></div>
+      <div class="f"><label>Activity *</label><select name="type" required></select></div>
+      <div class="f full offf"><div class="offbox">
+        <div class="f" id="leaveTypeWrap"><label>Leave type *</label><select name="leaveType"><option value="">— select —</option><option>Vacation Leave</option><option>Sick Leave</option><option>Emergency Leave</option><option>Bereavement Leave</option><option>Maternity / Paternity Leave</option><option>Birthday Leave</option><option>Leave Without Pay</option><option>Other</option></select></div>
+        <div class="f"><label id="reasonLabel">Reason *</label><textarea name="reason" placeholder="e.g. Family event in Cagayan de Oro"></textarea></div>
+      </div></div>
+      <div class="f full"><label id="titleLabel">Title / description *</label><input name="title" placeholder="e.g. Customer pick-up – Pik&Pak"></div>
+      <div class="f"><label>Start date *</label><input type="date" name="start" required></div>
+      <div class="f"><label>End date (multi-day)</label><input type="date" name="end"></div>
+      <div class="f work"><label>Start / departure time</label><input type="time" name="startTime"></div>
+      <div class="f work"><label>End / return time</label><input type="time" name="endTime"></div>
+      <div class="f full"><label id="repLabel">Representative(s) *</label><div class="reps" id="repBox"></div></div>
+      <div class="f full work"><div class="vbox">
+        <label class="vneed"><input type="checkbox" name="needVeh"> 🚚 Vehicle needed for this activity</label>
+        <div class="vfields">
+          <div class="f"><label>Vehicle *</label><select name="vehicle"></select></div>
+          <div class="f"><label>Route *</label><input name="route" list="routeList" placeholder="e.g. MCP → Malaybalay → Valencia → MCP"><datalist id="routeList"></datalist></div>
+          <div class="f full"><span class="hint" id="vehWarn"></span></div>
+        </div>
+      </div></div>
+      <div class="f work"><label>Quantity</label><input type="number" name="qty" step="any" min="0" placeholder="e.g. 60"></div>
+      <div class="f work"><label>Unit</label><input name="unit" list="unitList" placeholder="heads, kg, boxes…"><datalist id="unitList"><option>heads</option><option>kg</option><option>boxes</option><option>orders</option><option>trips</option></datalist></div>
+      <div class="f work"><label>Location / customer</label><input name="location" list="locList" placeholder="MCP, Pik&Pak, Malaybalay…"><datalist id="locList"></datalist></div>
+      <div class="f"><label>Status</label><select name="status"><option>Scheduled</option><option>Done</option><option>Postponed</option><option>Cancelled</option></select></div>
+      <div class="f full"><label>Notes</label><textarea name="notes" placeholder="Arrival time, reminders…"></textarea></div>
+      <div class="f full" id="repeatWrap">
+        <label>Repeat</label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select name="repeat" style="width:auto"><option value="">Does not repeat</option><option value="weekly">Weekly on…</option></select>
+          <div class="dows" id="dows"></div>
+          <span id="untilWrap" style="display:none;font-size:12.5px">until <input type="date" name="until" style="width:auto"></span>
+        </div>
       </div>
     </form>
+    <div class="mf">
+      <span class="foot sp" id="formMsg"></span>
+      <button class="btn" data-close>Cancel</button>
+      <button class="btn primary" id="saveBtn">Save</button>
+    </div>
   </div>
 </div>
 
-<div class="login-gate" id="loginGate">
-  <div class="modal login-card">
-    <h2>M. Montesclaros Farms, Inc.</h2>
-    <p style="font-size:12px; color:var(--ink-soft); margin:-6px 0 16px; line-height:1.5;">Sign in to access the inventory dashboard.</p>
-    <form id="loginForm">
-      <div class="field">
-        <label for="loginRole">Role <span style="color:var(--crimson)">*</span></label>
-        <select id="loginRole">
-          <option value="administrator">Administrator</option>
-          <option value="stockman">Stockman</option>
-          <option value="viewer">Viewer (view only)</option>
-        </select>
-      </div>
-      <div class="field" id="loginNameTextWrap">
-        <label for="loginName">Your Name <span style="color:var(--crimson)">*</span></label>
-        <input id="loginName" type="text" autocomplete="off" placeholder="Full name" required>
-      </div>
-      <div class="field" id="loginNameStockmanWrap" style="display:none;">
-        <label for="loginNameStockman">Stockman <span style="color:var(--crimson)">*</span></label>
-        <select id="loginNameStockman"></select>
-      </div>
-      <div class="field" id="loginPinWrap">
-        <label for="loginPin">PIN <span style="color:var(--crimson)">*</span></label>
-        <input id="loginPin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" required>
-      </div>
-      <p id="loginViewerNote" style="display:none; font-size:12px; color:var(--ink-soft); margin:-4px 0 12px;">No name or PIN needed for viewing — just click Sign In.</p>
-      <div class="form-error" id="loginError">Incorrect PIN — try again.</div>
-      <div class="submit-row">
-        <button type="submit">Sign In</button>
-      </div>
-    </form>
+<!-- activity detail -->
+<div class="ov" id="detOv">
+  <div class="modal">
+    <div class="mh"><span id="detDot" style="width:14px;height:14px;border-radius:4px"></span><h2 id="detTitle"></h2><button class="btn sm" data-close>✕</button></div>
+    <div class="detail" id="detBody"></div>
+    <div class="mf">
+      <button class="btn danger" id="delBtn">Delete</button>
+      <span class="sp"></span>
+      <button class="btn" id="doneBtn">✔ Mark done</button>
+      <button class="btn" id="dupBtn">Duplicate</button>
+      <button class="btn primary" id="editBtn">Edit</button>
+    </div>
   </div>
 </div>
 
-<div id="stampLayer"></div>
+<!-- day -->
+<div class="ov" id="dayOv">
+  <div class="modal">
+    <div class="mh"><h2 id="dayTitle"></h2><button class="btn sm" id="dayAdd">＋ Add</button><button class="btn sm" data-close>✕</button></div>
+    <div class="detail" id="dayBody"></div>
+  </div>
+</div>
+
+<!-- vehicle form -->
+<div class="ov" id="vehOv">
+  <div class="modal">
+    <div class="mh"><h2 id="vehTitle">Add vehicle</h2><button class="btn sm" data-close>✕</button></div>
+    <form id="vform" class="mb" autocomplete="off">
+      <div class="f"><label>Plate no. *</label><input name="plate" required placeholder="e.g. KAB 1234"></div>
+      <div class="f"><label>Vehicle name *</label><input name="name" required placeholder="e.g. Reefer Van 1"></div>
+      <div class="f"><label>Type</label><input name="vtype" list="vtypeList" placeholder="Reefer Van, Truck…"><datalist id="vtypeList"><option>Reefer Van</option><option>Truck</option><option>Pickup</option><option>L300 / Van</option><option>Motorcycle</option><option>Car</option></datalist></div>
+      <div class="f"><label>Assigned team</label><select name="team"></select></div>
+      <div class="f"><label>Assigned driver / rep</label><input name="driver" list="repList"><datalist id="repList"></datalist></div>
+      <div class="f"><label>Current odometer (km)</label><input type="number" name="odo" min="0" step="1"></div>
+      <div class="f"><label>Status</label><select name="status"><option>Active</option><option>Under Repair</option><option>Inactive</option></select></div>
+      <div class="f full"><label>Notes</label><textarea name="notes"></textarea></div>
+    </form>
+    <div class="mf">
+      <button class="btn danger" id="vDel">Delete</button>
+      <span class="foot sp" id="vMsg"></span>
+      <button class="btn" data-close>Cancel</button>
+      <button class="btn primary" id="vSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- maintenance form -->
+<div class="ov" id="mxOv">
+  <div class="modal">
+    <div class="mh"><h2 id="mxTitle">Log vehicle service</h2><button class="btn sm" data-close>✕</button></div>
+    <form id="mform" class="mb" autocomplete="off">
+      <div class="f"><label>Vehicle *</label><select name="plate" required></select></div>
+      <div class="f"><label>Service type *</label><select name="service" required></select></div>
+      <div class="f"><label>Date *</label><input type="date" name="date" required></div>
+      <div class="f"><label>Status</label><select name="status"><option>Done</option><option>Scheduled</option><option>Cancelled</option></select></div>
+      <div class="f"><label>Odometer (km)</label><input type="number" name="odo" min="0" step="1"><span class="hint" id="odoHint"></span></div>
+      <div class="f"><label>Shop / mechanic</label><input name="shop" list="shopList"><datalist id="shopList"></datalist></div>
+      <div class="f"><label>Representative</label><select name="rep"></select></div>
+      <div class="f"><label>Next due date</label><input type="date" name="nextDate"></div>
+      <div class="f"><label>Next due (km)</label><input type="number" name="nextKm" min="0" step="1"></div>
+      <div class="f full"><span class="hint" id="intHint"></span></div>
+      <div class="f full"><label>Notes (parts replaced, findings…)</label><textarea name="notes"></textarea></div>
+    </form>
+    <div class="mf">
+      <button class="btn danger" id="mDel">Delete</button>
+      <span class="foot sp" id="mMsg"></span>
+      <button class="btn" data-close>Cancel</button>
+      <button class="btn primary" id="mSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- settings -->
+<div class="ov" id="setOv">
+  <div class="modal">
+    <div class="mh"><h2>Settings</h2><button class="btn sm" data-close>✕</button></div>
+    <div class="mb">
+      <div class="f full"><label>Apps Script Web App URL</label><input id="sApi" placeholder="https://script.google.com/macros/s/…/exec"><span class="hint">Leave blank to use the built-in default (CONFIG.API_URL). Saved on this device only.</span></div>
+      <div class="f"><label>Edit PIN (if your team uses one)</label><input id="sPin" type="password"></div>
+      <div class="f"><label>Auto-refresh (minutes)</label><input id="sRef" type="number" min="0" step="1"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close>Cancel</button><button class="btn primary" id="setSave">Save</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-(function(){
-  // Sign-in PINs — one per role. Change these to your own PINs.
-  const PIN_BY_ROLE = {
-    administrator: '2026'
+/* ====================== CONFIG ======================
+   Paste your Apps Script Web App URL here (Deploy > Web app > URL ending in /exec).
+   While blank, the dashboard runs in DEMO mode with sample data. */
+const CONFIG = {
+  API_URL: '',
+  AUTO_REFRESH_MIN: 2,
+  DUE_SOON_DAYS: 14,   // "due soon" warning window
+  DUE_SOON_KM: 500
+};
+
+/* ====================== STATE ====================== */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('smlcal2_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('smlcal2_' + k, JSON.stringify(v)); } catch (e) {} }
+};
+const VEH_TEAM = { name: 'Vehicles', color: '#64748B' };
+const VTYPES = { 'Vehicle Service': '#CBD5E1', 'Vehicle Due': '#FECACA' };
+const DEF_F = { teams: [], reps: [], secs: [], types: [], statuses: [], q: '', mine: false };
+const STATUSES = ['Scheduled', 'Done', 'Postponed', 'Cancelled', 'Due', 'Overdue'];
+const S = {
+  acts: [], vehicles: [], maint: [], lists: { reps: [], types: [], teams: [], services: [] },
+  page: store.get('page', 'cal'),
+  view: store.get('view', window.innerWidth < 760 ? 'list' : 'month'),
+  cursor: todayStr(),
+  f: (() => { const f = Object.assign({}, DEF_F, store.get('filters', {}), { q: '' }); ['teams', 'reps', 'secs', 'types', 'statuses'].forEach(k => { if (!Array.isArray(f[k])) f[k] = []; }); return f; })(),
+  vf: { plate: '', svc: '', status: '', year: '' },
+  me: store.get('me', ''), api: store.get('api', '') || CONFIG.API_URL, pin: store.get('pin', ''),
+  refreshMin: store.get('refresh', CONFIG.AUTO_REFRESH_MIN),
+  demo: false, lastSync: null, editing: null, current: null, timer: null
+};
+
+/* ====================== DATES ====================== */
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function pad(n) { return String(n).padStart(2, '0'); }
+function ds(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function pd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function todayStr() { return ds(new Date()); }
+function addDays(s, n) { const d = pd(s); d.setDate(d.getDate() + n); return ds(d); }
+function addMonths(s, n) { const d = pd(s), r = new Date(d.getFullYear(), d.getMonth() + n, 1); r.setDate(Math.min(d.getDate(), new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate())); return ds(r); }
+function daysBetween(a, b) { return Math.round((pd(b) - pd(a)) / 864e5); }
+function weekStart(s) { const d = pd(s); d.setDate(d.getDate() - d.getDay()); return ds(d); }
+function fmtTime(t) { if (!t) return ''; const [h, m] = t.split(':').map(Number); return ((h % 12) || 12) + ':' + pad(m) + (h >= 12 ? ' PM' : ' AM'); }
+function fmtDate(s, o) { return s ? pd(s).toLocaleDateString('en-US', o || { weekday: 'short', month: 'short', day: 'numeric' }) : ''; }
+const fmtD = s => fmtDate(s, { month: 'short', day: 'numeric', year: 'numeric' });
+function normTime(s) {
+  if (!s) return '';
+  const m = String(s).trim().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])?/);
+  if (!m) return '';
+  let h = +m[1]; const ap = (m[3] || '').toUpperCase();
+  if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0;
+  return pad(h) + ':' + m[2];
+}
+const num = v => (v === '' || v == null || isNaN(Number(v))) ? '' : Number(v);
+const km = v => v === '' ? '—' : Number(v).toLocaleString() + ' km';
+
+/* ====================== HELPERS ====================== */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function toast(msg, ms) { const t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', ms || 2600); }
+const FALLBACK = ['#A9D08E','#FFE699','#9BC2E6','#F4B183','#C9C3EF','#F8CBAD','#A8DCD1','#D9B3E6','#D0D5DB','#E7E6E6'];
+function colorOf(type) {
+  if (VTYPES[type]) return VTYPES[type];
+  const t = S.lists.types.find(x => x.name === type);
+  if (t && t.color) return t.color;
+  let h = 0; for (const c of String(type)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return FALLBACK[h % FALLBACK.length];
+}
+function teamColor(name) { if (name === 'Vehicles') return VEH_TEAM.color; const t = S.lists.teams.find(x => x.name === name); return (t && t.color) || '#94a3b8'; }
+const allTeams = () => [...S.lists.teams.map(t => t.name), 'Vehicles'];
+const repTeam = n => (S.lists.reps.find(r => r.name === n) || {}).team || '';
+const repSecKey = n => { const r = S.lists.reps.find(x => x.name === n); return r ? (r.team || 'Others') + ' › ' + (r.section || 'General') : ''; };
+// reps grouped as { team: { section: [names] } } in Lists order
+function repTree() {
+  const t = {};
+  S.lists.reps.forEach(r => { const a = r.team || 'Others', b = r.section || 'General'; ((t[a] = t[a] || {})[b] = t[a][b] || []).push(r.name); });
+  return t;
+}
+
+/* ====================== MULTI-SELECT ====================== */
+// groups: [{label, sub?, items:[{value,label,color?}]}]
+function multiSelect(el, { all, unit, groups, selected, onChange }) {
+  const sel = new Set(selected), items = groups.flatMap(g => g.items);
+  const summary = () => !sel.size ? all : sel.size === 1 ? (items.find(i => i.value === [...sel][0]) || { label: [...sel][0] }).label : sel.size + ' ' + unit + ' selected';
+  const wasOpen = el.classList.contains('open'), q = el._q || '';
+  el.classList.toggle('act', sel.size > 0);
+  el.innerHTML = `<button type="button" class="msb" title="${esc([...sel].join(', '))}">${esc(summary())}</button>
+    <div class="msp"><div class="mst"><input type="search" placeholder="Search…" value="${esc(q)}"><button type="button" class="btn sm" data-all>All</button><button type="button" class="btn sm" data-none>Clear</button></div>
+    <div class="msl">${groups.map((g, gi) => {
+      const vis = g.items.filter(i => !q || i.label.toLowerCase().includes(q.toLowerCase()));
+      if (!vis.length) return '';
+      const allOn = vis.every(i => sel.has(i.value));
+      return (g.label ? `<div class="msg ${g.sub ? 'sub' : ''}" data-g="${gi}"><input type="checkbox" ${allOn ? 'checked' : ''}>${esc(g.label)}</div>` : '') +
+        vis.map(i => `<label class="msi ${g.sub ? 'd2' : ''}"><input type="checkbox" value="${esc(i.value)}" ${sel.has(i.value) ? 'checked' : ''}>${i.color ? `<i style="background:${i.color}"></i>` : ''}${esc(i.label)}</label>`).join('');
+    }).join('') || '<div class="foot" style="padding:10px">No match</div>'}</div></div>`;
+  if (wasOpen) { el.classList.add('open'); const inp = el.querySelector('.mst input'); inp.focus(); inp.setSelectionRange(q.length, q.length); }
+  const redraw = () => multiSelect(el, { all, unit, groups, selected: [...sel], onChange });
+  const fire = () => { onChange([...sel]); };
+  el.querySelector('.msb').onclick = () => { $$('.ms.open').forEach(m => m !== el && m.classList.remove('open')); el.classList.toggle('open'); if (el.classList.contains('open')) el.querySelector('.mst input').focus(); };
+  el.querySelector('.mst input').oninput = e => { el._q = e.target.value; redraw(); };
+  el.querySelector('[data-all]').onclick = () => { const qq = (el._q || '').toLowerCase(); items.filter(i => !qq || i.label.toLowerCase().includes(qq)).forEach(i => sel.add(i.value)); fire(); };
+  el.querySelector('[data-none]').onclick = () => { sel.clear(); el._q = ''; fire(); };
+  el.querySelectorAll('.msg').forEach(h => h.onclick = e => {
+    const g = groups[h.dataset.g], qq = (el._q || '').toLowerCase(), vis = g.items.filter(i => !qq || i.label.toLowerCase().includes(qq));
+    const on = !vis.every(i => sel.has(i.value)); vis.forEach(i => on ? sel.add(i.value) : sel.delete(i.value)); e.preventDefault(); fire();
+  });
+  el.querySelectorAll('label.msi input').forEach(c => c.onchange = () => { c.checked ? sel.add(c.value) : sel.delete(c.value); fire(); });
+}
+document.addEventListener('click', e => { if (!e.composedPath().some(n => n.classList && n.classList.contains('ms'))) $$('.ms.open').forEach(m => m.classList.remove('open')); });
+const splitReps = v => Array.isArray(v) ? v : String(v || '').split(/[,;\/]/).map(s => s.trim()).filter(Boolean);
+function normAct(a) {
+  const start = a.start, end = a.end && a.end >= a.start ? a.end : a.start;
+  return {
+    kind: 'act', id: String(a.id), start, end, startTime: normTime(a.startTime), endTime: normTime(a.endTime),
+    team: a.team || '', type: a.type || 'Other', title: a.title || a.type || 'Activity', reps: splitReps(a.reps),
+    qty: num(a.qty), unit: a.unit || '', location: a.location || '', status: a.status || 'Scheduled', notes: a.notes || '',
+    vehicle: String(a.vehicle || '').trim(), route: a.route || '', leaveType: a.leaveType || '', reason: a.reason || '',
+    updatedBy: a.updatedBy || '', updatedAt: a.updatedAt || ''
   };
-  // Named stockman accounts — add more entries here for more stockmen.
-  const STOCKMAN_USERS = [
-    { name: 'JOBERT JUMAWAN', pin: '0806' },
-    { name: 'EVINE JAKE APEROCHO', pin: '5418' },
-    { name: 'RODOLFO ORONGAN JR.', pin: '5678' },
-    { name: 'DAISY JOY DIRECTO', pin: '2026' }
-  ];
+}
+function normVeh(v) { return { id: String(v.id), plate: String(v.plate || '').trim(), name: v.name || v.plate, vtype: v.vtype || '', team: v.team || '', driver: v.driver || '', odo: num(v.odo), status: v.status || 'Active', notes: v.notes || '', updatedBy: v.updatedBy || '', updatedAt: v.updatedAt || '' }; }
+function normMx(m) { return { id: String(m.id), date: m.date || '', plate: String(m.plate || '').trim(), service: m.service || 'Other', odo: num(m.odo), shop: m.shop || '', nextDate: m.nextDate || '', nextKm: num(m.nextKm), status: m.status || 'Done', rep: m.rep || '', notes: m.notes || '', updatedBy: m.updatedBy || '', updatedAt: m.updatedAt || '' }; }
+function fillLists() {
+  const L = S.lists;
+  ['Sales', 'MCP', 'Slaughterhouse', 'Growing'].forEach((n, i) => { if (!L.teams.find(t => t.name === n)) L.teams.push({ name: n, color: ['#2563EB', '#7C3AED', '#16A34A', '#B45309'][i] }); });
+  S.f.teams = S.f.teams.filter(t => allTeams().includes(t));
+  const types = new Set(L.types.map(t => t.name));
+  S.acts.forEach(a => { if (!types.has(a.type)) { types.add(a.type); L.types.push({ name: a.type, color: '', team: a.team }); } });
+  const svcs = new Set(L.services.map(s => s.name));
+  S.maint.forEach(m => { if (!svcs.has(m.service)) { svcs.add(m.service); L.services.push({ name: m.service, km: 0, months: 0 }); } });
+  if (!S.f.teams.length) S.f.teams = allTeams();
+}
+const isMine = e => S.me && e.reps.includes(S.me);
 
-  // Google Sheet database config — see the sync section further down for the Apps Script.
-  const SHEET_ID = '1079P0I4rPVycWaDbWUawSlHlRpKTr4vu9Ix26sbdh5M';
-  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzN5C9iLPx1bxSqamIl3OX0S7m_5cEL6x7Jexw9Tx9K2CO7sBUXnQAISqc372I_oTynnQ/exec';
-  const POLL_MS = 5000;
-  function sheetConfigured(){ return WEBAPP_URL && WEBAPP_URL.indexOf('PASTE_YOUR') !== 0; }
-  let loading = sheetConfigured(); // true until the first sheet read completes
+/* ====================== VEHICLE DUE LOGIC ====================== */
+function vehicleServices(v) {
+  const today = todayStr(), svcs = S.lists.services, names = [];
+  const add = n => { if (n && !names.includes(n)) names.push(n); };
+  svcs.filter(s => s.km || s.months).forEach(s => add(s.name));
+  S.maint.filter(m => m.plate === v.plate).forEach(m => add(m.service));
+  return names.map(name => {
+    const def = svcs.find(s => s.name === name) || { name, km: 0, months: 0 };
+    const recs = S.maint.filter(m => m.plate === v.plate && m.service === name && m.date);
+    const done = recs.filter(m => m.status === 'Done').sort((a, b) => b.date.localeCompare(a.date))[0] || null;
+    const sched = recs.filter(m => m.status === 'Scheduled' && (!done || m.date >= done.date)).sort((a, b) => a.date.localeCompare(b.date))[0] || null;
+    let nextDate = '', nextKm = '';
+    if (done) {
+      nextDate = done.nextDate || (def.months ? addMonths(done.date, def.months) : '');
+      nextKm = done.nextKm !== '' ? done.nextKm : (def.km && done.odo !== '' ? done.odo + def.km : '');
+    }
+    const daysLeft = nextDate ? daysBetween(today, nextDate) : null;
+    const kmLeft = nextKm !== '' && v.odo !== '' ? nextKm - v.odo : null;
+    const tracked = def.km || def.months || nextDate || nextKm !== '';
+    let state = 'ok';
+    if (!tracked) state = sched ? 'sched' : 'info';
+    else if (!done) state = sched ? 'sched' : 'none';
+    else if ((daysLeft !== null && daysLeft < 0) || (kmLeft !== null && kmLeft <= 0)) state = 'overdue';
+    else if ((daysLeft !== null && daysLeft <= CONFIG.DUE_SOON_DAYS) || (kmLeft !== null && kmLeft <= CONFIG.DUE_SOON_KM)) state = 'soon';
+    return { v, name, def, done, sched, nextDate, nextKm, daysLeft, kmLeft, state };
+  });
+}
+const activeVehicles = () => S.vehicles.filter(v => v.status !== 'Inactive');
+function allDue() { return activeVehicles().flatMap(vehicleServices); }
+function vehicleState(list) { return list.some(x => x.state === 'overdue') ? 'overdue' : list.some(x => x.state === 'soon') ? 'soon' : 'ok'; }
+function dueText(x) {
+  const p = [];
+  if (x.daysLeft !== null) p.push(x.daysLeft < 0 ? Math.abs(x.daysLeft) + ' days overdue' : x.daysLeft === 0 ? 'due today' : 'in ' + x.daysLeft + ' days');
+  if (x.kmLeft !== null) p.push(x.kmLeft <= 0 ? Math.abs(x.kmLeft).toLocaleString() + ' km over' : x.kmLeft.toLocaleString() + ' km left');
+  return p.join(' · ');
+}
+const STATE_LBL = { ok: 'OK', soon: 'Due soon', overdue: 'Overdue', sched: 'Scheduled', none: 'No record' };
 
-  const CAT_LABEL = { pork:'Pork', beef:'Beef', chicken:'Chicken', lamb:'Lamb' };
-  const CAT_COLOR = { pork:'var(--c-pork)', beef:'var(--c-beef)', chicken:'var(--c-chicken)', lamb:'var(--c-lamb)' };
-  const REASONS = {
-    in: ['Production Yield','Return','Transfer from other cold storage'],
-    out: ['Sold','Consumption','Spoilage','Inventory adjustment']
-  };
-
-  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-  function hoursAgo(h){ return Date.now() - h*3600*1000; }
-
-  let state = { items: [], transactions: [] };
-
-  let currentType = 'in';
-  let removeConfirmId = null;
-
-  // ===== helpers =====
-  function weightKg(item){
-    if(item.unit==='kg') return item.stock;
-    if(item.unit==='lb') return item.stock*0.453592;
-    return 0;
+/* ====================== CALENDAR EVENTS ====================== */
+function calEvents() {
+  const ev = S.acts.slice();
+  const vb = Object.fromEntries(S.vehicles.map(v => [v.plate, v]));
+  S.maint.forEach(m => {
+    if (!m.date) return;
+    const v = vb[m.plate] || { name: m.plate };
+    ev.push({ kind: 'mx', id: 'M:' + m.id, ref: m.id, start: m.date, end: m.date, startTime: '', team: 'Vehicles', type: 'Vehicle Service',
+      title: `${m.service} – ${v.name}`, reps: m.rep ? [m.rep] : [], qty: '', unit: '', location: m.shop, status: m.status, notes: m.notes });
+  });
+  allDue().forEach(x => {
+    if (!x.nextDate || x.sched) return;
+    ev.push({ kind: 'due', id: 'D:' + x.v.plate + '|' + x.name, plate: x.v.plate, service: x.name, start: x.nextDate, end: x.nextDate, startTime: '',
+      team: 'Vehicles', type: 'Vehicle Due', title: `Due: ${x.name} – ${x.v.name}`, reps: x.v.driver ? [x.v.driver] : [], qty: '', unit: '',
+      location: '', status: x.state === 'overdue' ? 'Overdue' : 'Due', notes: dueText(x) });
+  });
+  return ev;
+}
+function passes(e, f) {
+  f = f || S.f;
+  if (e.team && !f.teams.includes(e.team)) return false;
+  if (f.reps.length && !e.reps.some(r => f.reps.includes(r))) return false;
+  if (f.secs.length && !e.reps.some(r => f.secs.includes(repSecKey(r)))) return false;
+  if (f.types.length && !f.types.includes(e.type)) return false;
+  if (f.statuses.length && !f.statuses.includes(e.status)) return false;
+  if (f.mine && !isMine(e)) return false;
+  if (f.q) {
+    const h = [e.title, e.notes, e.location, e.type, e.team, e.reps.join(' '), e.route, e.vehicle, e.vehicle && vName(e.vehicle), e.leaveType].join(' ').toLowerCase();
+    if (!h.includes(f.q.toLowerCase())) return false;
   }
-  function status(item){
-    if(item.stock < item.reorder) return 'low';
-    if(item.stock < item.reorder*1.3) return 'watch';
-    return 'ok';
+  return true;
+}
+const byTime = (a, b) => (a.startTime || '99').localeCompare(b.startTime || '99') || a.type.localeCompare(b.type);
+const on = (list, day) => list.filter(a => a.start <= day && a.end >= day).sort(byTime);
+
+/* ====================== DATA ====================== */
+async function load(silent) {
+  if (!S.api) {
+    S.demo = true;
+    if (!S.acts.length) {
+      S.acts = DEMO.acts.map(normAct); S.vehicles = DEMO.vehicles.map(normVeh); S.maint = DEMO.maint.map(normMx);
+      S.lists = JSON.parse(JSON.stringify(DEMO.lists));
+    }
+    banner('Demo mode — sample data only. Paste your Apps Script Web App URL in <b>CONFIG.API_URL</b> (or ⚙ Settings) to connect your Google Sheet. Changes in demo mode are not saved.');
+    fillLists(); renderAll(); return;
   }
-  function gaugePct(item){
-    const max = Math.max(item.reorder*2, 1);
-    return Math.min(100, (item.stock/max)*100);
+  const btn = $('#refreshBtn');
+  if (!silent) btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const r = await fetch(S.api + (S.api.includes('?') ? '&' : '?') + 't=' + Date.now());
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'Load failed');
+    S.demo = false;
+    S.acts = (j.activities || []).filter(a => a.start).map(normAct);
+    S.vehicles = (j.vehicles || []).filter(v => v.plate).map(normVeh);
+    S.maint = (j.maintenance || []).filter(m => m.plate).map(normMx);
+    const L = j.lists || {};
+    S.lists = { reps: L.reps || [], types: L.types || [], teams: L.teams || [], services: L.services || [] };
+    S.lastSync = new Date();
+    store.set('cache', { acts: S.acts, vehicles: S.vehicles, maint: S.maint, lists: S.lists, t: Date.now() });
+    banner('');
+  } catch (e) {
+    const c = store.get('cache', null);
+    if (c) { S.acts = c.acts; S.vehicles = c.vehicles || []; S.maint = c.maint || []; S.lists = c.lists; S.lastSync = new Date(c.t); }
+    banner('Could not reach the Google Sheet (' + esc(e.message) + '). ' + (c ? 'Showing the last saved copy.' : ''));
   }
-  function fmt(n, d){ return Number(n).toLocaleString(undefined,{minimumFractionDigits:d||0, maximumFractionDigits:d||1}); }
-  function itemTotals(itemId){
-    let totalIn = 0, totalOut = 0;
-    state.transactions.forEach(t=>{
-      if(t.itemId===itemId){
-        if(t.type==='in') totalIn += t.qty;
-        else totalOut += t.qty;
+  btn.innerHTML = '⟳ Refresh';
+  fillLists(); renderAll();
+}
+function banner(html) { const b = $('#banner'); b.innerHTML = html; b.style.display = html ? 'block' : 'none'; }
+
+async function api(table, action, payload) {
+  if (S.demo) {
+    const key = { Activities: 'acts', Vehicles: 'vehicles', Maintenance: 'maint' }[table];
+    const nz = { Activities: normAct, Vehicles: normVeh, Maintenance: normMx }[table];
+    const stamp = o => Object.assign({}, o, { updatedBy: S.me, updatedAt: new Date().toLocaleString() });
+    if (action === 'add') (payload.items || [payload.item]).forEach(it => S[key].push(nz(stamp(Object.assign({}, it, { id: 'D' + Math.random().toString(36).slice(2, 8) })))));
+    if (action === 'update') S[key] = S[key].map(a => a.id === payload.item.id ? nz(stamp(payload.item)) : a);
+    if (action === 'delete') S[key] = S[key].filter(a => a.id !== payload.id);
+    if (table === 'Maintenance') {
+      const it = payload.item || (payload.items || [])[0];
+      const v = it && S.vehicles.find(x => x.plate === it.plate);
+      if (v && it.odo !== '' && (v.odo === '' || Number(it.odo) > v.odo)) v.odo = Number(it.odo);
+    }
+    fillLists(); renderAll(); return { ok: true };
+  }
+  const r = await fetch(S.api, { method: 'POST', body: JSON.stringify(Object.assign({ table, action, pin: S.pin, user: S.me }, payload)) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'Save failed');
+  await load(true);
+  return j;
+}
+
+/* ====================== RENDER: COMMON ====================== */
+function renderAll() {
+  renderHeader();
+  if (S.page === 'cal') { renderControls(); renderView(); renderAside(); } else renderVehicles();
+}
+function opt(v, label, sel) { return `<option value="${esc(v)}"${v === sel ? ' selected' : ''}>${esc(label)}</option>`; }
+function repOptions(sel, blank) {
+  const tree = repTree();
+  return opt('', blank, sel) + Object.entries(tree).flatMap(([t, secs]) => Object.entries(secs).map(([s, ns]) =>
+    `<optgroup label="${esc(t + (s !== 'General' ? ' – ' + s : ''))}">${ns.map(n => opt(n, n, sel)).join('')}</optgroup>`)).join('');
+}
+function renderHeader() {
+  $('#meSel').innerHTML = repOptions(S.me, '— select your name —');
+  $$('#pageTabs button').forEach(b => b.classList.toggle('on', b.dataset.p === S.page));
+  $('#pageCal').classList.toggle('hidden', S.page !== 'cal');
+  $('#pageVeh').classList.toggle('hidden', S.page !== 'veh');
+  $('#addBtn').textContent = S.page === 'cal' ? '＋ Add activity' : '＋ Log service';
+  const due = allDue(), od = due.filter(x => x.state === 'overdue').length, soon = due.filter(x => x.state === 'soon').length;
+  const a = $('#vAlert'); a.textContent = od + soon; a.classList.toggle('hidden', !(od + soon));
+  a.style.background = od ? 'var(--red)' : 'var(--amber)';
+  $('#repList').innerHTML = S.lists.reps.map(r => `<option>${esc(r.name)}</option>`).join('');
+}
+
+/* ====================== RENDER: CALENDAR ====================== */
+function renderControls() {
+  const L = S.lists;
+  $('#teamPills').innerHTML = allTeams().map(t => `<button data-team="${esc(t)}" class="${S.f.teams.includes(t) ? 'on' : ''}" style="--tc:${teamColor(t)}">${t === 'Vehicles' ? '🚚 ' : ''}${esc(t)}</button>`).join('');
+  const tree = repTree(), setM = k => v => setFilter(k, v);
+  // Representatives: Team header + Section sub-header
+  multiSelect($('#fRep'), { all: 'All representatives', unit: 'reps', selected: S.f.reps, onChange: setM('reps'),
+    groups: Object.entries(tree).flatMap(([t, secs]) => Object.entries(secs).map(([s, ns]) =>
+      ({ label: t + (s !== 'General' ? ' › ' + s : ''), items: ns.map(n => ({ value: n, label: n })) }))) });
+  // Sections
+  multiSelect($('#fSec'), { all: 'All sections', unit: 'sections', selected: S.f.secs, onChange: setM('secs'),
+    groups: Object.entries(tree).map(([t, secs]) => ({ label: t, items: Object.keys(secs).map(s => ({ value: t + ' › ' + s, label: s === 'General' ? t + ' (general)' : s })) })) });
+  // Activities grouped by team
+  const tg = {};
+  L.types.forEach(t => (tg[t.team || 'General'] = tg[t.team || 'General'] || []).push(t.name));
+  tg['Vehicles'] = Object.keys(VTYPES);
+  multiSelect($('#fType'), { all: 'All activities', unit: 'activities', selected: S.f.types, onChange: setM('types'),
+    groups: Object.entries(tg).map(([g, ns]) => ({ label: g, items: ns.map(n => ({ value: n, label: n, color: colorOf(n) })) })) });
+  multiSelect($('#fStatus'), { all: 'All status', unit: 'status', selected: S.f.statuses, onChange: setM('statuses'),
+    groups: [{ label: '', items: STATUSES.map(s => ({ value: s, label: s })) }] });
+  $('#fMine').checked = S.f.mine; $('#fMine').disabled = !S.me;
+  $$('#viewTabs button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
+  const legendTypes = L.types.filter(t => !t.team || S.f.teams.includes(t.team)).map(t => t.name);
+  if (S.f.teams.includes('Vehicles')) legendTypes.push(...Object.keys(VTYPES));
+  $('#legend').innerHTML = legendTypes.map(t => `<span data-t="${esc(t)}" class="${S.f.types.length ? (S.f.types.includes(t) ? 'sel' : 'off') : ''}" style="background:${colorOf(t)}">${esc(t)}</span>`).join('');
+  $('#locList').innerHTML = [...new Set(S.acts.map(a => a.location).filter(Boolean))].map(l => `<option>${esc(l)}</option>`).join('');
+}
+function evClass(e) { return [isMine(e) && 'mine', e.status === 'Cancelled' && 'cancelled', e.status === 'Overdue' && 'overdue'].filter(Boolean).join(' '); }
+function chip(a) {
+  const tip = `${a.title}\n${a.team ? a.team + ' · ' : ''}${a.type}${a.startTime ? ' · ' + fmtTime(a.startTime) : ''}${a.reps.length ? '\n' + a.reps.join(', ') : ''}${a.location ? '\n@ ' + a.location : ''}${a.notes ? '\n' + a.notes : ''}`;
+  const icon = a.kind === 'due' ? '⚠ ' : a.kind === 'mx' ? '🔧 ' : (a.status === 'Done' ? '✔ ' : '') + (a.type === 'Leave' ? '🏖 ' : a.type === 'Rest Day' ? '🛌 ' : a.vehicle ? '🚚 ' : '');
+  return `<span class="chip ${evClass(a)}" data-id="${esc(a.id)}" title="${esc(tip)}" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}">${icon}${a.startTime ? '<b>' + fmtTime(a.startTime) + '</b> ' : ''}${esc(a.title)}</span>`;
+}
+function evCard(a, withDate) {
+  const meta = [a.reps.join(', '), a.location && '@ ' + a.location, a.qty !== '' && a.qty + ' ' + a.unit, a.vehicle && '🚚 ' + vName(a.vehicle) + (a.route ? ': ' + a.route : '')].filter(Boolean).join(' · ');
+  return `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}">
+    <div class="t">${a.status === 'Done' ? '✔ ' : ''}${a.startTime ? fmtTime(a.startTime) + ' · ' : ''}${esc(a.title)}</div>
+    <div class="m">${a.team ? `<span class="tag" style="--tc:${teamColor(a.team)}">${esc(a.team)}</span>` : ''}${esc(a.type)}${withDate && a.end !== a.start ? ' · ' + fmtDate(a.start) + ' – ' + fmtDate(a.end) : ''}</div>
+    ${meta ? `<div class="m">${esc(meta)}</div>` : ''}
+  </div>`;
+}
+function weekTotal(list, ws) {
+  const we = addDays(ws, 6);
+  const inWeek = list.filter(a => a.start >= ws && a.start <= we && a.status !== 'Cancelled');
+  const units = {};
+  inWeek.forEach(a => { if (a.qty !== '') units[a.unit || 'qty'] = (units[a.unit || 'qty'] || 0) + a.qty; });
+  return Object.entries(units).map(([u, v]) => `<div><b>${v.toLocaleString()}</b> ${esc(u)}</div>`).join('') +
+    `<div>${inWeek.length} activit${inWeek.length === 1 ? 'y' : 'ies'}</div>`;
+}
+function renderView() {
+  const list = calEvents().filter(e => passes(e)), v = $('#view'), today = todayStr(), c = pd(S.cursor);
+  if (S.view === 'month') {
+    $('#rangeLabel').textContent = MONTHS[c.getMonth()] + ' ' + c.getFullYear();
+    const first = new Date(c.getFullYear(), c.getMonth(), 1), last = new Date(c.getFullYear(), c.getMonth() + 1, 0);
+    let day = weekStart(ds(first)); const end = addDays(weekStart(ds(last)), 6);
+    let h = '<table class="month"><thead><tr>' + DOW.map(d => `<th>${d.slice(0, 3)}</th>`).join('') + '<th class="wk">Week total</th></tr></thead><tbody>';
+    while (day <= end) {
+      const ws = day; h += '<tr>';
+      for (let i = 0; i < 7; i++) {
+        const evs = on(list, day), d = pd(day), max = 4;
+        const cls = [d.getMonth() !== c.getMonth() && 'out', day === today && 'today'].filter(Boolean).join(' ');
+        h += `<td class="${cls}" data-date="${day}"><span class="dn">${d.getDate()}</span>${evs.slice(0, max).map(chip).join('')}${evs.length > max ? `<span class="more" data-day="${day}">+${evs.length - max} more</span>` : ''}</td>`;
+        day = addDays(day, 1);
       }
-    });
-    return { totalIn, totalOut };
-  }
-  function timeAgo(ts){
-    const mins = Math.round((Date.now()-ts)/60000);
-    if(mins < 1) return 'just now';
-    if(mins < 60) return mins+'m ago';
-    const hrs = Math.round(mins/60);
-    if(hrs < 24) return hrs+'h ago';
-    const days = Math.round(hrs/24);
-    return days+'d ago';
-  }
-
-  // ===== render: stats =====
-  function txKg(t){ return t.unit==='pcs' ? 0 : t.unit==='lb' ? t.qty*0.453592 : t.qty; }
-
-  function renderStats(){
-    const totalKg = state.items.reduce((s,i)=>s+weightKg(i),0);
-    const totalPcs = state.items.filter(i=>i.unit==='pcs').reduce((s,i)=>s+i.stock,0);
-    const lowCount = state.items.filter(i=>status(i)==='low').length;
-
-    const allTimeIn = state.transactions.filter(t=>t.type==='in').reduce((s,t)=>s+txKg(t),0);
-    const allTimeOut = state.transactions.filter(t=>t.type==='out').reduce((s,t)=>s+txKg(t),0);
-
-    const startToday = new Date(); startToday.setHours(0,0,0,0);
-    const todays = state.transactions.filter(t=>t.ts>=startToday.getTime());
-    const inKg = todays.filter(t=>t.type==='in').reduce((s,t)=>s+txKg(t),0);
-    const outKg = todays.filter(t=>t.type==='out').reduce((s,t)=>s+txKg(t),0);
-
-    const cards = [
-      { label:'Total stock on hand', value: fmt(totalKg,3)+' <small>kg</small>' + (totalPcs? ' <small>+ '+fmt(totalPcs,0)+' pcs</small>':''), accent:'var(--gold)' },
-      { label:'Total stock in', value: fmt(allTimeIn,3)+' <small>kg</small>', sub:'+'+fmt(inKg,3)+' kg today', accent:'var(--sage)' },
-      { label:'Total stock out', value: fmt(allTimeOut,3)+' <small>kg</small>', sub:'-'+fmt(outKg,3)+' kg today', accent:'var(--crimson)' },
-      { label:'Low stock cuts', value: lowCount, accent: lowCount? 'var(--crimson)':'var(--sage)', warn: lowCount>0, sub: lowCount? 'below reorder level' : 'all cuts stocked' },
-      { label:"Today's movement", value: '+'+fmt(inKg,3)+' / -'+fmt(outKg,3), sub:'kg in / out today', accent:'var(--gold)' },
-    ];
-    document.getElementById('stats').innerHTML = cards.map(c=>`
-      <div class="stat-card ${c.warn?'warn':''}" style="--accent:${c.accent}">
-        <p class="stat-label">${c.label}</p>
-        <div class="stat-value">${c.value}</div>
-        ${c.sub?`<div class="stat-sub">${c.sub}</div>`:''}
-      </div>
-    `).join('');
-  }
-
-  // ===== render: inventory tag grid =====
-  function renderTagGrid(){
-    const search = document.getElementById('search').value.trim().toLowerCase();
-    const cat = document.getElementById('categoryFilter').value;
-    const sortBy = document.getElementById('sortBy').value;
-
-    let items = state.items.filter(i=>{
-      const matchesSearch = i.name.toLowerCase().includes(search);
-      const matchesCat = cat==='all' || i.category===cat;
-      return matchesSearch && matchesCat;
-    });
-
-    items = items.slice().sort((a,b)=>{
-      if(sortBy==='name') return a.name.localeCompare(b.name);
-      if(sortBy==='stockLow') return a.stock-b.stock;
-      if(sortBy==='stockHigh') return b.stock-a.stock;
-      return 0;
-    });
-
-    const grid = document.getElementById('tagGrid');
-    if(items.length===0){
-      grid.innerHTML = loading
-        ? `<div class="empty-note">Loading inventory from your Google Sheet…</div>`
-        : `<div class="empty-note">No cuts match your search — try a different filter, or add a new cut.</div>`;
-      return;
+      h += `<td class="wk">${weekTotal(list, ws)}</td></tr>`;
     }
-
-    grid.innerHTML = items.map(item=>{
-      const st = status(item);
-      const pct = gaugePct(item);
-      const confirming = removeConfirmId===item.id;
-      const { totalIn, totalOut } = itemTotals(item.id);
-      return `
-      <div class="tag-card" data-id="${item.id}">
-        <div class="tag-hole"></div>
-        <div class="tag-top">
-          <div>
-            <span class="tag-cat" style="--cat-color:${CAT_COLOR[item.category]}">${CAT_LABEL[item.category]}</span>
-            <h3 class="tag-name">${item.name}</h3>
-          </div>
-          ${canEdit() ? `
-          <div class="tag-actions">
-            <button class="tag-edit" data-edit="${item.id}">Edit</button>
-            <button class="tag-remove ${confirming?'confirming':''}" data-remove="${item.id}">${confirming? 'confirm?':'✕'}</button>
-          </div>` : ''}
-        </div>
-        <div class="tag-stock-label">Ending Stock</div>
-        <div class="tag-stock">${fmt(item.stock,3)} <small>${item.unit}</small></div>
-        <div class="tag-inout">
-          <span class="in">▲ In ${fmt(totalIn,3)}</span>
-          <span class="out">▼ Out ${fmt(totalOut,3)}</span>
-        </div>
-        <div class="gauge"><div class="gauge-fill ${st}" style="width:${pct}%"></div></div>
-        <div class="tag-foot">
-          <span>Reorder at ${fmt(item.reorder,3)} ${item.unit}</span>
-          <span class="tag-status ${st}">${st==='low'?'LOW STOCK':st==='watch'?'WATCH':'IN STOCK'}</span>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // ===== render: activity log =====
-  function renderLog(){
-    const log = document.getElementById('ticketLog');
-    if(state.transactions.length===0){
-      log.innerHTML = loading
-        ? `<div class="empty-note">Loading activity from your Google Sheet…</div>`
-        : `<div class="empty-note">No movements recorded yet.</div>`;
-      return;
+    v.innerHTML = h + '</tbody></table>';
+  } else if (S.view === 'week') {
+    const ws = weekStart(S.cursor), we = addDays(ws, 6);
+    $('#rangeLabel').textContent = fmtDate(ws, { month: 'short', day: 'numeric' }) + ' – ' + fmtDate(we, { month: 'short', day: 'numeric', year: 'numeric' });
+    let h = '<div class="week">';
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(ws, i), evs = on(list, day);
+      h += `<div class="col"><div class="hd ${day === today ? 'today' : ''}" data-date="${day}">${DOW[i].slice(0, 3)}<b>${pd(day).getDate()}</b></div><div class="body">${evs.map(a => evCard(a)).join('') || '<div class="foot" style="text-align:center;padding:10px">—</div>'}</div></div>`;
     }
-    log.innerHTML = state.transactions.slice(0,25).map(t=>`
-      <div class="ticket">
-        <div class="stamp ${t.type}">${t.type==='in'?'RECEIVED':'DISPATCH'}</div>
-        <div class="ticket-body">
-          <div class="ticket-title">${t.itemName} <span style="color:var(--ink-soft); font-weight:500;">· ${t.ref||'—'}</span></div>
-          <div class="ticket-meta">${t.reason} · Batch ${t.batch||'—'} · ${t.stockman||'—'} · ${t.location||'—'} · logged by ${t.loggedInUser||'—'}${t.note? ' · '+t.note : ''} · ${timeAgo(t.ts)}</div>
-        </div>
-        <div class="ticket-qty ${t.type}">${t.type==='in'?'+':'-'}${fmt(t.qty,3)} ${t.unit}</div>
-      </div>
-    `).join('');
-  }
-
-  // ===== render: category chart =====
-  function renderChart(){
-    const totals = {};
-    Object.keys(CAT_LABEL).forEach(c=>totals[c]=0);
-    state.items.forEach(i=>{ totals[i.category]+=weightKg(i); });
-    const max = Math.max(...Object.values(totals), 1);
-    const el = document.getElementById('categoryChart');
-    el.innerHTML = Object.keys(CAT_LABEL).map(c=>`
-      <div class="chart-row">
-        <div class="name">${CAT_LABEL[c]}</div>
-        <div class="chart-track"><div class="chart-bar" style="width:${(totals[c]/max*100)}%; background:${CAT_COLOR[c]}"></div></div>
-        <div class="val">${fmt(totals[c],3)} kg</div>
-      </div>
-    `).join('');
-  }
-
-  // ===== movement form population =====
-  function populateMoveItemSelect(){
-    const list = document.getElementById('cutsList');
-    list.innerHTML = state.items.map(i=>`<option value="${i.name}"></option>`).join('');
-    updateMoveUnit();
-    populateReasons();
-  }
-  function findItemByTypedName(text){
-    const t = text.trim().toLowerCase();
-    return state.items.find(i=>i.name.toLowerCase()===t);
-  }
-  function updateMoveUnit(){
-    const item = findItemByTypedName(document.getElementById('moveItem').value);
-    document.getElementById('moveUnit').textContent = item ? item.unit : '';
-  }
-  function populateReasons(){
-    const reasonSel = document.getElementById('moveReason');
-    reasonSel.innerHTML = REASONS[currentType].map(r=>`<option value="${r}">${r}</option>`).join('');
-  }
-
-  function renderAll(){
-    renderStats();
-    renderTagGrid();
-    renderLog();
-    renderChart();
-    populateMoveItemSelect();
-  }
-
-  // ===== toast / stamp feedback =====
-  function showToast(type, text){
-    const layer = document.getElementById('stampLayer');
-    const el = document.createElement('div');
-    el.className = 'toast '+(type==='out'?'out':'');
-    el.textContent = text;
-    layer.appendChild(el);
-    setTimeout(()=>el.remove(), 2700);
-  }
-
-  // ===== events: type toggle =====
-  document.querySelectorAll('.type-toggle button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.type-toggle button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      currentType = btn.dataset.type;
-      populateReasons();
-    });
-  });
-
-  document.getElementById('moveItem').addEventListener('input', updateMoveUnit);
-
-  // ===== cart: queue multiple in/out lines before recording them together =====
-  let cart = [];
-
-  function effectiveStock(itemId){
-    const item = state.items.find(i=>i.id===itemId);
-    if(!item) return 0;
-    let stock = item.stock;
-    cart.forEach(line=>{
-      if(line.itemId===itemId) stock += (line.type==='in' ? line.qty : -line.qty);
-    });
-    return stock;
-  }
-
-  function renderCart(){
-    const list = document.getElementById('cartList');
-    const btn = document.getElementById('recordAllBtn');
-    btn.textContent = 'Record All (' + cart.length + ')';
-    if(cart.length===0){
-      list.innerHTML = `<div class="cart-empty-note">No items added yet — add at least one cut above.</div>`;
-      return;
-    }
-    list.innerHTML = cart.map(line=>`
-      <div class="cart-item">
-        <div class="cart-dir ${line.type}">${line.type==='in'?'IN':'OUT'}</div>
-        <div class="cart-body">
-          <div class="cart-name">${line.itemName}</div>
-          <div class="cart-meta">${fmt(line.qty,3)} ${line.unit} · ${line.reason}</div>
-        </div>
-        <button type="button" class="cart-remove" data-cart-remove="${line.tempId}">✕</button>
-      </div>
-    `).join('');
-  }
-
-  document.getElementById('addToCartBtn').addEventListener('click', ()=>{
-    const itemText = document.getElementById('moveItem').value;
-    const qty = parseFloat(document.getElementById('moveQty').value);
-    const reason = document.getElementById('moveReason').value;
-    const lineErr = document.getElementById('lineError');
-    const item = findItemByTypedName(itemText);
-
-    if(!item){
-      lineErr.textContent = 'Select a valid cut from the search results.';
-      lineErr.classList.add('show');
-      document.getElementById('moveItem').focus();
-      return;
-    }
-    if(!qty || qty<=0){
-      lineErr.textContent = 'Enter a valid quantity.';
-      lineErr.classList.add('show');
-      return;
-    }
-    if(currentType==='out' && qty > effectiveStock(item.id)){
-      lineErr.textContent = `Only ${fmt(effectiveStock(item.id),3)} ${item.unit} available (after items already in cart).`;
-      lineErr.classList.add('show');
-      return;
-    }
-    lineErr.classList.remove('show');
-
-    cart.push({
-      tempId: uid(), itemId: item.id, itemName: item.name, category: item.category, unit: item.unit,
-      type: currentType, qty, reason
-    });
-    document.getElementById('moveQty').value = '';
-    document.getElementById('moveItem').value = '';
-    updateMoveUnit();
-    renderCart();
-  });
-
-  document.getElementById('cartList').addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-cart-remove]');
-    if(!btn) return;
-    cart = cart.filter(l=>l.tempId!==btn.dataset.cartRemove);
-    renderCart();
-  });
-
-  // ===== events: movement submit (records every line in the cart together) =====
-  document.getElementById('movementForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    if(!canEdit()) return; // safety net — form is hidden for view-only roles anyway
-    const ref = document.getElementById('moveRef').value.trim();
-    const batch = document.getElementById('moveBatch').value.trim();
-    const stockman = document.getElementById('moveStockman').value.trim();
-    const location = document.getElementById('moveLocation').value.trim();
-    const note = document.getElementById('moveNote').value.trim();
-    const errEl = document.getElementById('moveError');
-
-    if(!ref){
-      errEl.textContent = 'Reference # is required.';
-      errEl.classList.add('show');
-      document.getElementById('moveRef').focus();
-      return;
-    }
-    if(!batch){
-      errEl.textContent = 'Batch Code / Production Date is required.';
-      errEl.classList.add('show');
-      document.getElementById('moveBatch').focus();
-      return;
-    }
-    if(!stockman){
-      errEl.textContent = 'Stockman In-charge is required.';
-      errEl.classList.add('show');
-      document.getElementById('moveStockman').focus();
-      return;
-    }
-    if(!location){
-      errEl.textContent = 'Location is required.';
-      errEl.classList.add('show');
-      document.getElementById('moveLocation').focus();
-      return;
-    }
-    if(cart.length===0){
-      errEl.textContent = 'Add at least one cut to the cart before recording.';
-      errEl.classList.add('show');
-      return;
-    }
-    errEl.classList.remove('show');
-
-    const user = currentUser.name;
-    const touchedItemIds = [];
-
-    cart.forEach(line=>{
-      const item = state.items.find(i=>i.id===line.itemId);
-      if(!item) return;
-      item.stock = line.type==='in' ? item.stock+line.qty : item.stock-line.qty;
-      item.stock = Math.round(item.stock*1000)/1000;
-      touchedItemIds.push(item.id);
-
-      const tx = { id: uid(), itemId:item.id, itemName:item.name, category:item.category, unit:item.unit, type:line.type, qty:line.qty, ref, reason:line.reason, batch, stockman, location, loggedInUser:user, note, ts: Date.now() };
-      state.transactions.unshift(tx);
-      syncAddTransaction(tx, item.stock, user);
-    });
-
-    const cartCount = cart.length;
-    cart = [];
-    document.getElementById('moveRef').value='';
-    document.getElementById('moveBatch').value='';
-    document.getElementById('moveStockman').value='';
-    document.getElementById('moveLocation').value='';
-    document.getElementById('moveNote').value='';
-
-    renderAll();
-    showToast('in', 'RECORDED ' + cartCount + ' item' + (cartCount>1?'s':'') + ' · confirmed by ' + user);
-
-    touchedItemIds.forEach(id=>{
-      const card = document.querySelector(`.tag-card[data-id="${id}"]`);
-      if(card){ card.classList.add('flash'); setTimeout(()=>card.classList.remove('flash'), 900); }
-    });
-  });
-
-  // ===== events: search / filter / sort =====
-  document.getElementById('search').addEventListener('input', renderTagGrid);
-  document.getElementById('categoryFilter').addEventListener('change', renderTagGrid);
-  document.getElementById('sortBy').addEventListener('change', renderTagGrid);
-
-  // ===== Login gate + role-based permissions =====
-  const ROLE_LABEL = { administrator:'Administrator', stockman:'Stockman', viewer:'Viewer' };
-  const EDIT_ROLES = ['administrator','stockman'];
-  let currentUser = { name:'', role:'' };
-  function canEdit(){ return EDIT_ROLES.includes(currentUser.role); }
-
-  function updateSignedInBadge(){
-    const badge = document.getElementById('signedInBadge');
-    const text = document.getElementById('signedInText');
-    const switchBtn = document.getElementById('switchUserBtn');
-    if(currentUser.name){
-      badge.classList.remove('empty');
-      text.textContent = 'Signed in as ' + currentUser.name + ' (' + ROLE_LABEL[currentUser.role] + ')';
-      switchBtn.style.display = 'inline';
-    } else {
-      badge.classList.add('empty');
-      text.textContent = 'Not signed in';
-      switchBtn.style.display = 'none';
-    }
-  }
-
-  function applyRolePermissions(){
-    const editAllowed = canEdit();
-    const isViewer = currentUser.role === 'viewer';
-    document.getElementById('openAddItem').style.display = editAllowed ? '' : 'none';
-    const moveForm = document.getElementById('movementForm');
-    const moveViewOnly = document.getElementById('moveViewOnly');
-    if(editAllowed){
-      moveForm.style.display = '';
-      moveViewOnly.style.display = 'none';
-    } else {
-      moveForm.style.display = 'none';
-      moveViewOnly.style.display = 'block';
-    }
-
-    // Viewers only see the Inventory panel — Record Movement and Activity are hidden entirely.
-    document.getElementById('movementPanelSection').style.display = isViewer ? 'none' : '';
-    document.getElementById('logPanelSection').style.display = isViewer ? 'none' : '';
-    const inventoryPanel = document.getElementById('inventoryPanel');
-    inventoryPanel.style.gridColumn = isViewer ? '1 / -1' : '';
-    inventoryPanel.classList.toggle('viewer-mode', isViewer);
-
-    renderTagGrid(); // edit/delete buttons on cards are only added when canEdit() is true
-  }
-
-  document.getElementById('switchUserBtn').addEventListener('click', ()=>{
-    currentUser = { name:'', role:'' };
-    updateSignedInBadge();
-    document.getElementById('loginPin').value = '';
-    document.getElementById('loginGate').style.display = 'flex';
-    setTimeout(()=>document.getElementById('loginName').focus(), 60);
-  });
-
-  // Populate the stockman name dropdown and toggle which name field shows per role
-  const stockmanSelect = document.getElementById('loginNameStockman');
-  stockmanSelect.innerHTML = STOCKMAN_USERS.map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
-  document.getElementById('loginRole').addEventListener('change', function(){
-    const isStockman = this.value === 'stockman';
-    const isViewer = this.value === 'viewer';
-    document.getElementById('loginNameTextWrap').style.display = (isStockman || isViewer) ? 'none' : '';
-    document.getElementById('loginNameStockmanWrap').style.display = isStockman ? '' : 'none';
-    document.getElementById('loginPinWrap').style.display = isViewer ? 'none' : '';
-    document.getElementById('loginViewerNote').style.display = isViewer ? 'block' : 'none';
-    document.getElementById('loginName').required = !isStockman && !isViewer;
-    document.getElementById('loginPin').required = !isViewer;
-  });
-
-  document.getElementById('loginForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const role = document.getElementById('loginRole').value;
-    const pin = document.getElementById('loginPin').value.trim();
-    const errEl = document.getElementById('loginError');
-    let name, pinOk;
-
-    if(role === 'viewer'){
-      name = 'Viewer';
-      pinOk = true;
-    } else if(role === 'stockman'){
-      name = stockmanSelect.value;
-      const match = STOCKMAN_USERS.find(u=>u.name===name);
-      pinOk = !!match && pin === match.pin;
-    } else {
-      name = document.getElementById('loginName').value.trim();
-      pinOk = pin === PIN_BY_ROLE[role];
-    }
-
-    if(!pinOk){
-      errEl.textContent = 'Incorrect PIN for that user — try again.';
-      errEl.classList.add('show');
-      document.getElementById('loginPin').value = '';
-      document.getElementById('loginPin').focus();
-      return;
-    }
-    errEl.classList.remove('show');
-    currentUser = { name, role };
-    document.getElementById('loginGate').style.display = 'none';
-    updateSignedInBadge();
-    applyRolePermissions();
-  });
-
-  // ===== events: edit / remove item (role protected) =====
-  document.getElementById('tagGrid').addEventListener('click', function(e){
-    if(!canEdit()) return; // safety net — buttons aren't rendered for view-only roles anyway
-    const editBtn = e.target.closest('[data-edit]');
-    if(editBtn){
-      openEditModal(editBtn.dataset.edit);
-      return;
-    }
-    const btn = e.target.closest('[data-remove]');
-    if(!btn) return;
-    const id = btn.dataset.remove;
-    if(removeConfirmId===id){
-      const deletedItem = state.items.find(i=>i.id===id);
-      state.items = state.items.filter(i=>i.id!==id);
-      state.transactions = state.transactions.filter(t=>t.itemId!==id);
-      removeConfirmId = null;
-      renderAll();
-      showToast('out', 'CUT DELETED · by '+currentUser.name);
-      syncDeleteItem(id, currentUser.name, deletedItem ? deletedItem.name : '');
-    } else {
-      removeConfirmId = id;
-      renderTagGrid();
-      setTimeout(()=>{ if(removeConfirmId===id){ removeConfirmId=null; renderTagGrid(); } }, 3000);
-    }
-  });
-
-  // ===== events: add / edit cut modal =====
-  const overlay = document.getElementById('modalOverlay');
-
-  function openAddModal(){
-    document.getElementById('addItemForm').reset();
-    document.getElementById('editItemId').value = '';
-    document.getElementById('modalTitle').textContent = 'Add new cut';
-    document.getElementById('modalSubmitBtn').textContent = 'Add cut';
-    document.getElementById('newStockLabel').textContent = 'Starting stock';
-    document.getElementById('newStock').value = 0;
-    document.getElementById('newReorder').value = 5;
-    overlay.classList.add('show');
-  }
-
-  function openEditModal(id){
-    const item = state.items.find(i=>i.id===id);
-    if(!item) return;
-    document.getElementById('editItemId').value = item.id;
-    document.getElementById('modalTitle').textContent = 'Edit cut';
-    document.getElementById('modalSubmitBtn').textContent = 'Save changes';
-    document.getElementById('newStockLabel').textContent = 'Current stock';
-    document.getElementById('newName').value = item.name;
-    document.getElementById('newCategory').value = item.category;
-    document.getElementById('newUnit').value = item.unit;
-    document.getElementById('newStock').value = item.stock;
-    document.getElementById('newReorder').value = item.reorder;
-    overlay.classList.add('show');
-  }
-
-  document.getElementById('openAddItem').addEventListener('click', ()=>{ if(canEdit()) openAddModal(); });
-  document.getElementById('cancelAddItem').addEventListener('click', ()=> overlay.classList.remove('show'));
-  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.classList.remove('show'); });
-
-  document.getElementById('addItemForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const name = document.getElementById('newName').value.trim();
-    if(!name) return;
-    const editId = document.getElementById('editItemId').value;
-    const category = document.getElementById('newCategory').value;
-    const unit = document.getElementById('newUnit').value;
-    const stock = parseFloat(document.getElementById('newStock').value)||0;
-    const reorder = parseFloat(document.getElementById('newReorder').value)||0;
-    const user = currentUser.name;
-
-    if(editId){
-      const item = state.items.find(i=>i.id===editId);
-      if(item){
-        item.name = name; item.category = category; item.unit = unit;
-        item.stock = stock; item.reorder = reorder;
-        overlay.classList.remove('show');
-        renderAll();
-        showToast('in', 'CUT UPDATED · '+item.name+' · by '+user);
-        syncUpdateItem(item, user);
-      }
-      return;
-    }
-
-    const item = { id: uid(), name, category, unit, stock, reorder };
-    state.items.push(item);
-    this.reset();
-    overlay.classList.remove('show');
-
-    let tx = null;
-    if(stock > 0){
-      tx = {
-        id: uid(), itemId:item.id, itemName:item.name, category:item.category, unit:item.unit,
-        type:'in', qty:stock, ref:'NEW-CUT', reason:'New Cut - Initial Stock', batch:'—',
-        stockman:user, location:'—', loggedInUser:user, note:'Auto-logged from cut creation', ts: Date.now()
-      };
-      state.transactions.unshift(tx);
-    }
-
-    renderAll();
-    showToast('in', 'NEW CUT ADDED · '+item.name+' · by '+user);
-    syncAddItemWithStock(item, tx, user);
-  });
-
-  // ===== CSV export =====
-  function toCSV(){
-    const rows = [['Date','Time','Reference #','Item','Category','Type','Quantity','Unit','Reason','Batch Code / Production Date','Stockman In-charge','Location','Logged In User','Note']];
-    state.transactions.slice().sort((a,b)=>a.ts-b.ts).forEach(t=>{
-      const d = new Date(t.ts);
-      rows.push([
-        d.toLocaleDateString(), d.toLocaleTimeString(), t.ref||'',
-        t.itemName, CAT_LABEL[t.category]||t.category, t.type==='in'?'In':'Out',
-        t.qty, t.unit, t.reason, t.batch||'', t.stockman||'', t.location||'', t.loggedInUser||'', t.note||''
-      ]);
-    });
-    return rows.map(r=>r.map(v=>{
-      const s = String(v).replace(/"/g,'""');
-      return /[",\n]/.test(s) ? '"'+s+'"' : s;
-    }).join(',')).join('\n');
-  }
-  document.getElementById('exportCsv').addEventListener('click', ()=>{
-    const csv = toCSV();
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'meat-ledger-activity-'+new Date().toISOString().slice(0,10)+'.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    showToast('in', 'CSV exported — ready to import into Google Sheets');
-  });
-
-  // ===== Google Sheet as live database =====
-  // Bound to: https://docs.google.com/spreadsheets/d/1079P0I4rPVycWaDbWUawSlHlRpKTr4vu9Ix26sbdh5M/edit
-  // The sheet is the source of truth: cuts + activity are read from it on
-  // load, refreshed on a short interval, and every add/edit/delete/movement
-  // writes straight back to it. No toggle, no setup panel — this is always on.
-  //
-  // One-time setup (you do this once, in your Google account):
-  // 1. Open the sheet → Extensions → Apps Script.
-  // 2. Delete the placeholder code and paste in the script below.
-  // 3. Deploy → New deployment → Web app → Execute as: Me →
-  //    Who has access: Anyone → Deploy → copy the /exec URL.
-  // 4. Paste that URL into WEBAPP_URL right here, replacing the placeholder.
-  // The script auto-creates two tabs the first time it runs: "Items" and "Activity".
-
-  /* ============ Apps Script — paste this whole block into Extensions → Apps Script ============
-
-  const SHEET_ID = '1079P0I4rPVycWaDbWUawSlHlRpKTr4vu9Ix26sbdh5M';
-  const ITEMS_TAB = 'Items';
-  const ACTIVITY_TAB = 'Activity';
-  const AUDIT_TAB = 'AuditLog';
-
-  const ITEMS_HEADER_ROWS = 2;      // Items: row1 title, row2 headers, data from row 3
-  const ACTIVITY_HEADER_ROWS = 3;   // Activity: row1 company, row2 subtitle, row3 headers, data from row 4
-  const AUDIT_HEADER_ROWS = 2;      // AuditLog: row1 title, row2 headers, data from row 3
-
-  function getSS(){ return SpreadsheetApp.openById(SHEET_ID); }
-
-  function getTab(name, headerCols, titleRows){
-    var ss = getSS();
-    var lock = LockService.getScriptLock();
-    lock.waitLock(10000);
-    try {
-      var sh = ss.getSheetByName(name);
-      if(!sh){
-        try {
-          sh = ss.insertSheet(name);
-        } catch(err){
-          // another simultaneous request created it first — just use that one
-          sh = ss.getSheetByName(name);
-        }
-      }
-      if(sh && sh.getLastRow() === 0){
-        (titleRows || [name]).forEach(function(r){ sh.appendRow([r]); }); // title/spacer row(s)
-        sh.appendRow(headerCols);                                          // column headers row
-        // data starts on the row right after
-      }
-      return sh;
-    } finally {
-      lock.releaseLock();
-    }
-  }
-  function itemsSheet(){ return getTab(ITEMS_TAB, ['ID','Name','Category','Unit','Stock','Reorder'], ['ITEMS']); }
-  function activitySheet(){ return getTab(ACTIVITY_TAB, ['ID','Date','Reference #','Item ID','Item','Category','Type','Quantity','Unit','Reason','Batch Code / Production Date','Stockman In-charge','Note','Location','Logged In User'], ['M. MONTESCLAROS FARMS, INC. - SAYRE HIGHWAY', 'MEAT CUTTING PLANT INVENTORY AND ACTIVITY LOG']); }
-  function auditSheet(){ return getTab(AUDIT_TAB, ['Timestamp','User','Action','Item','Details'], ['AUDIT LOG — who changed what']); }
-
-  function logAudit(user, action, itemName, details){
-    auditSheet().appendRow([new Date(), user || 'Unknown', action, itemName || '', details || '']);
-  }
-
-  function rowsToObjects(sh, keys, headerRows){
-    var data = sh.getDataRange().getValues();
-    var out = [];
-    for (var i = headerRows; i < data.length; i++){
-      var row = data[i];
-      if (!row[0]) continue;
-      var obj = {};
-      for (var k = 0; k < keys.length; k++){ obj[keys[k]] = row[k]; }
-      out.push(obj);
-    }
-    return out;
-  }
-
-  function findRowById(sh, id, headerRows){
-    var data = sh.getDataRange().getValues();
-    for (var i = headerRows; i < data.length; i++){ if (String(data[i][0]) === String(id)) return i + 1; }
-    return -1;
-  }
-
-  function doGet(e){
-    var items = rowsToObjects(itemsSheet(), ['id','name','category','unit','stock','reorder'], ITEMS_HEADER_ROWS);
-    var raw = rowsToObjects(activitySheet(), ['id','ts','ref','itemId','itemName','category','type','qty','unit','reason','batch','stockman','note','location','loggedInUser'], ACTIVITY_HEADER_ROWS);
-    var transactions = raw.map(function(t){
-      var d = t.ts instanceof Date ? t.ts.getTime() : new Date(t.ts).getTime();
-      return Object.assign({}, t, { ts: d });
-    });
-    var auditRaw = rowsToObjects(auditSheet(), ['ts','user','action','item','details'], AUDIT_HEADER_ROWS);
-    var audit = auditRaw.map(function(a){
-      var d = a.ts instanceof Date ? a.ts.getTime() : new Date(a.ts).getTime();
-      return Object.assign({}, a, { ts: d });
-    });
-    return out({ status:'ok', items: items, transactions: transactions, audit: audit });
-  }
-
-  function doPost(e){
-    var body = JSON.parse(e.postData.contents);
-    if (body.action === 'addItem')          return addItem(body.item, body.user);
-    if (body.action === 'addItemWithStock') return addItemWithStock(body.item, body.tx, body.user);
-    if (body.action === 'updateItem')       return updateItem(body.item, body.user);
-    if (body.action === 'deleteItem')       return deleteItem(body.id, body.user, body.itemName);
-    if (body.action === 'addTransaction')   return addTransaction(body.tx, body.newStock, body.user);
-    return out({ status:'error', message:'Unknown action' });
-  }
-
-  function addItem(item, user){
-    itemsSheet().appendRow([item.id, item.name, item.category, item.unit, item.stock, item.reorder]);
-    logAudit(user, 'Add Cut', item.name, 'Category: '+item.category+', Starting stock: '+item.stock+' '+item.unit+', Reorder: '+item.reorder);
-    return out({ status:'ok' });
-  }
-  function addItemWithStock(item, tx, user){
-    // Writes the new item AND its initial-stock transaction in a single request,
-    // so there's no window where one exists in the sheet and the other doesn't.
-    itemsSheet().appendRow([item.id, item.name, item.category, item.unit, item.stock, item.reorder]);
-    logAudit(user, 'Add Cut', item.name, 'Category: '+item.category+', Starting stock: '+item.stock+' '+item.unit+', Reorder: '+item.reorder);
-    if (tx){
-      activitySheet().appendRow([tx.id, new Date(tx.ts), tx.ref, tx.itemId, tx.itemName, tx.category, tx.type, tx.qty, tx.unit, tx.reason, tx.batch, tx.stockman, tx.note || '', tx.location || '', user || '']);
-      logAudit(user, 'Stock In', tx.itemName, tx.qty + ' ' + tx.unit + ' · ' + tx.reason + ' (auto-logged from cut creation)');
-    }
-    return out({ status:'ok' });
-  }
-  function updateItem(item, user){
-    var sh = itemsSheet();
-    var row = findRowById(sh, item.id, ITEMS_HEADER_ROWS);
-    if (row > 0) sh.getRange(row, 1, 1, 6).setValues([[item.id, item.name, item.category, item.unit, item.stock, item.reorder]]);
-    logAudit(user, 'Edit Cut', item.name, 'Category: '+item.category+', Stock: '+item.stock+' '+item.unit+', Reorder: '+item.reorder);
-    return out({ status:'ok' });
-  }
-  function deleteItem(id, user, itemName){
-    var sh = itemsSheet();
-    var row = findRowById(sh, id, ITEMS_HEADER_ROWS);
-    if (row > 0) sh.deleteRow(row);
-    logAudit(user, 'Delete Cut', itemName, 'Item ID: '+id);
-    return out({ status:'ok' });
-  }
-  function addTransaction(tx, newStock, user){
-    activitySheet().appendRow([tx.id, new Date(tx.ts), tx.ref, tx.itemId, tx.itemName, tx.category, tx.type, tx.qty, tx.unit, tx.reason, tx.batch, tx.stockman, tx.note || '', tx.location || '', user || '']);
-    if (newStock !== undefined && tx.itemId){
-      var sh = itemsSheet();
-      var row = findRowById(sh, tx.itemId, ITEMS_HEADER_ROWS);
-      if (row > 0) sh.getRange(row, 5).setValue(newStock);
-    }
-    logAudit(user, tx.type === 'in' ? 'Stock In' : 'Stock Out', tx.itemName,
-      tx.qty + ' ' + tx.unit + ' · Ref ' + tx.ref + ' · ' + tx.reason + ' · Stockman: ' + tx.stockman + ' · Location: ' + tx.location);
-    return out({ status:'ok' });
-  }
-  function out(obj){
-    return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-  }
-
-  ============ end Apps Script ============ */
-
-  function setSyncStatus(text, ok){
-    const el = document.getElementById('syncStatus');
-    el.textContent = text;
-    el.className = 'sync-status ' + (ok ? 'on' : 'off');
-  }
-
-  // ----- read: pull items + transactions from the sheet -----
-  let firstLoadDone = false;
-  let loadRequestId = 0; // only the response from the most recently fired request is applied
-  function loadFromSheet(){
-    if(!sheetConfigured()){
-      setSyncStatus('Google Sheet database not connected — add the Web App URL in the code (showing local demo data).', false);
-      return;
-    }
-    const requestId = ++loadRequestId;
-    fetch(WEBAPP_URL + '?action=getAll', { method:'GET' })
-      .then(r=>r.json())
-      .then(data=>{
-        if(requestId !== loadRequestId) return; // a newer refresh has already started — discard this stale one
-        if(data && data.status==='ok'){
-          state.items = (data.items||[]).map(i=>({
-            id: String(i.id), name: i.name, category: i.category, unit: i.unit,
-            stock: Number(i.stock)||0, reorder: Number(i.reorder)||0
-          }));
-          state.transactions = (data.transactions||[]).map(t=>({
-            id: String(t.id), itemId: String(t.itemId), itemName: t.itemName, category: t.category,
-            unit: t.unit, type: t.type, qty: Number(t.qty)||0, ref: t.ref, reason: t.reason,
-            batch: t.batch, stockman: t.stockman, location: t.location, loggedInUser: t.loggedInUser, note: t.note||'', ts: Number(t.ts)||Date.now()
-          })).sort((a,b)=>b.ts-a.ts);
-          loading = false;
-          renderAll();
-          setSyncStatus('Live · synced from Google Sheet · '+new Date().toLocaleTimeString(), true);
-        } else {
-          loading = false;
-          renderAll();
-          setSyncStatus('Google Sheet returned an unexpected response — check the Apps Script deployment.', false);
-        }
-        firstLoadDone = true;
-      })
-      .catch(()=>{
-        if(requestId !== loadRequestId) return; // a newer refresh has already started — discard this stale one
-        loading = false;
-        renderAll();
-        setSyncStatus('Could not reach the Google Sheet — check the deployment URL and access settings.', false);
-        firstLoadDone = true;
-      });
-  }
-
-  // ----- write: push a change, then re-pull so the sheet stays the single source of truth -----
-  function sheetPost(payload){
-    if(!sheetConfigured()) return;
-    fetch(WEBAPP_URL, {
-      method:'POST',
-      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    }).then(()=>{ loadFromSheet(); })
-      .catch(()=>{ showToast('out', 'Could not reach Google Sheet — check the sync connection'); });
-  }
-
-  function syncAddItem(item, user){ sheetPost({ action:'addItem', item, user }); }
-  function syncAddItemWithStock(item, tx, user){ sheetPost({ action:'addItemWithStock', item, tx, user }); }
-  function syncUpdateItem(item, user){ sheetPost({ action:'updateItem', item, user }); }
-  function syncDeleteItem(id, user, itemName){ sheetPost({ action:'deleteItem', id, user, itemName }); }
-  function syncAddTransaction(tx, newStock, user){ sheetPost({ action:'addTransaction', tx, newStock, user }); }
-
-  if(sheetConfigured()){
-    loadFromSheet();
-    setInterval(loadFromSheet, POLL_MS);
+    v.innerHTML = h + '</div><div class="foot" style="padding:8px 12px;border-top:1px solid var(--line)">Week total: ' + weekTotal(list, ws).replace(/<\/?div>/g, ' ') + '</div>';
   } else {
-    setSyncStatus('Google Sheet database not connected — add the Web App URL in the code (showing local demo data).', false);
+    const first = ds(new Date(c.getFullYear(), c.getMonth(), 1)), last = ds(new Date(c.getFullYear(), c.getMonth() + 1, 0));
+    $('#rangeLabel').textContent = MONTHS[c.getMonth()] + ' ' + c.getFullYear();
+    let h = '';
+    for (let day = first; day <= last; day = addDays(day, 1)) {
+      const evs = on(list, day); if (!evs.length) continue;
+      h += `<div class="day ${day === today ? 'today' : ''}"><div class="dl">${fmtDate(day, { month: 'short', day: 'numeric' })}<small>${DOW[pd(day).getDay()]}</small></div><div class="items">` +
+        evs.map(a => `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}">
+          <div class="t">${a.startTime ? fmtTime(a.startTime) : 'All day'}</div>
+          <div><div class="t">${esc(a.title)}</div><div class="m">${a.team ? `<span class="tag" style="--tc:${teamColor(a.team)}">${esc(a.team)}</span>` : ''}${esc([a.type, a.reps.join(', '), a.location && '@ ' + a.location].filter(Boolean).join(' · '))}</div></div>
+          <span class="badge ${esc(a.status)}">${esc(a.status)}</span></div>`).join('') + '</div></div>';
+    }
+    v.innerHTML = h ? '<div class="list">' + h + '</div>' : '<div class="empty">No activities match the filters this month.</div>';
   }
-
-  // ===== clock =====
-  function tickClock(){
-    const now = new Date();
-    const opts = { weekday:'short', month:'short', day:'numeric' };
-    document.getElementById('clock').textContent = now.toLocaleDateString(undefined,opts)+' · '+now.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
+function mini(a, showDate) {
+  return `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}"></span><div>
+    <b>${esc(a.title)}</b><small>${showDate ? fmtDate(a.start) + (a.end !== a.start ? ' – ' + fmtDate(a.end) : '') + ' · ' : ''}${a.startTime ? fmtTime(a.startTime) + ' · ' : ''}${esc([a.team, a.reps.join(', ')].filter(Boolean).join(' · '))}</small></div></div>`;
+}
+function renderAside() {
+  const today = todayStr(), c = pd(S.cursor);
+  const mFirst = ds(new Date(c.getFullYear(), c.getMonth(), 1)), mLast = ds(new Date(c.getFullYear(), c.getMonth() + 1, 0));
+  const all = calEvents().filter(a => a.status !== 'Cancelled');
+  $('#todayList').innerHTML = on(all, today).filter(a => !isOff(a.type)).map(a => mini(a)).join('') || '<div class="foot">No team activities today.</div>';
+  const offs = on(all, today).filter(a => isOff(a.type));
+  $('#offList').innerHTML = offs.map(a => `<div class="mini" data-id="${esc(a.id)}"><span class="dot" style="background:${colorOf(a.type)};--tc:${teamColor(a.team)}"></span><div><b>${esc(a.reps.join(', '))}</b><small>${esc(a.leaveType || a.type)}${a.end !== a.start ? ' · until ' + fmtDate(a.end) : ''}</small></div></div>`).join('') || '<div class="foot">Everyone is on duty today.</div>';
+  if (S.me) {
+    $('#myTitle').textContent = S.me + ' — next 14 days';
+    const end = addDays(today, 13);
+    const mine = all.filter(a => isMine(a) && a.end >= today && a.start <= end && a.status !== 'Done').sort((a, b) => a.start.localeCompare(b.start) || byTime(a, b));
+    $('#myList').innerHTML = mine.map(a => mini(a, true)).join('') || '<div class="foot">Nothing scheduled for you.</div>';
+  } else {
+    $('#myTitle').textContent = 'My next 14 days';
+    $('#myList').innerHTML = '<div class="foot">Pick your name at the top (“I am”) to see your schedule. Your activities get a ★.</div>';
   }
-  tickClock();
-  setInterval(tickClock, 30000);
+  const alerts = allDue().filter(x => x.state === 'overdue' || x.state === 'soon').sort((a, b) => (a.state === 'overdue' ? 0 : 1) - (b.state === 'overdue' ? 0 : 1));
+  $('#vAlerts').innerHTML = alerts.map(x => `<div class="mini" data-veh="${esc(x.v.plate)}"><span class="badge ${x.state}">${STATE_LBL[x.state]}</span><div><b>${esc(x.name)}</b><small>${esc(x.v.name)} · ${esc(dueText(x))}</small></div></div>`).join('') || '<div class="foot">All vehicles are up to date.</div>';
+  const inMonth = calEvents().filter(a => passes(a) && a.start <= mLast && a.end >= mFirst);
+  const done = inMonth.filter(a => a.status === 'Done').length;
+  const upcoming = inMonth.filter(a => a.status === 'Scheduled' && a.end >= today).length;
+  const people = new Set(inMonth.flatMap(a => a.reps)).size;
+  $('#kpiTitle').textContent = MONTHS[c.getMonth()] + ' ' + c.getFullYear();
+  $('#kpis').innerHTML = `<div class="kpi"><b>${inMonth.length}</b><span>activities</span></div><div class="kpi"><b>${done}</b><span>done</span></div>
+    <div class="kpi"><b>${upcoming}</b><span>upcoming</span></div><div class="kpi"><b>${people}</b><span>reps involved</span></div>`;
+  const counts = {}; inMonth.forEach(a => counts[a.type] = (counts[a.type] || 0) + 1);
+  const mx = Math.max(1, ...Object.values(counts));
+  $('#byType').innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([t, n]) =>
+    `<div class="statrow"><span>${esc(t)}</span><b>${n}</b></div><div class="track"><i style="width:${n / mx * 100}%;background:${colorOf(t)};filter:saturate(1.6) brightness(.9)"></i></div>`).join('') || '<div class="foot">No activities.</div>';
+  $('#syncInfo').textContent = S.demo ? 'Demo data · not connected' : (S.lastSync ? 'Last synced ' + S.lastSync.toLocaleTimeString() + (S.refreshMin > 0 ? ' · auto-refresh every ' + S.refreshMin + ' min' : '') : '');
+}
 
-  updateSignedInBadge();
-  setTimeout(()=>document.getElementById('loginName').focus(), 100);
+/* ====================== RENDER: VEHICLES ====================== */
+function renderVehicles() {
+  const vf = S.vf, today = todayStr(), year = today.slice(0, 4), month = today.slice(0, 7);
+  $('#vfVeh').innerHTML = opt('', 'All vehicles', vf.plate) + S.vehicles.map(v => opt(v.plate, v.name + ' (' + v.plate + ')', vf.plate)).join('');
+  $('#vfSvc').innerHTML = opt('', 'All services', vf.svc) + S.lists.services.map(s => opt(s.name, s.name, vf.svc)).join('');
+  $('#vfStatus').value = vf.status;
+  const years = [...new Set(S.maint.map(m => m.date.slice(0, 4)).filter(Boolean).concat(year))].sort().reverse();
+  $('#vfYear').innerHTML = opt('', 'All years', vf.year) + years.map(y => opt(y, y, vf.year)).join('');
 
-  renderCart();
-  renderAll();
+  // KPIs
+  const due = allDue(), trips = tripsOf();
+  const scheduled = S.maint.filter(m => m.status === 'Scheduled' && m.date >= today).length;
+  const tToday = trips.filter(t => t.start <= today && t.end >= today), wEnd = addDays(today, 6);
+  const onRoad = new Set(tToday.map(t => t.vehicle)).size;
+  $('#vkpis').innerHTML = `
+    <div class="kpi"><b>${activeVehicles().length}</b><span>active vehicles</span></div>
+    <div class="kpi"><b>${onRoad}</b><span>vehicles booked today</span></div>
+    <div class="kpi"><b>${trips.filter(t => t.end >= today && t.start <= wEnd).length}</b><span>trips next 7 days</span></div>
+    <div class="kpi red"><b>${due.filter(x => x.state === 'overdue').length}</b><span>services overdue</span></div>
+    <div class="kpi amber"><b>${due.filter(x => x.state === 'soon').length}</b><span>due in ${CONFIG.DUE_SOON_DAYS} days / ${CONFIG.DUE_SOON_KM} km</span></div>
+    <div class="kpi"><b>${scheduled}</b><span>scheduled services</span></div>`;
+
+  // cards
+  const vs = S.vehicles.filter(v => !vf.plate || v.plate === vf.plate);
+  $('#vgrid').innerHTML = vs.map(v => {
+    const svc = vehicleServices(v), st = v.status === 'Inactive' ? 'inactive' : vehicleState(svc);
+    const rows = svc.filter(x => x.state !== 'none' && x.state !== 'info');
+    const none = svc.filter(x => x.state === 'none').map(x => x.name);
+    const lastRepair = S.maint.filter(m => m.plate === v.plate && m.status === 'Done').sort((a, b) => b.date.localeCompare(a.date))[0];
+    return `<div class="vcard ${st}">
+      <div class="vh"><div class="sp"><b>${esc(v.name)}</b><small>${esc([v.plate, v.vtype, v.team].filter(Boolean).join(' · '))}</small></div>
+        <span class="badge ${esc(v.status.split(' ')[0])}">${esc(v.status)}</span></div>
+      <div class="odo">🛣 <b>${km(v.odo)}</b><button class="btn sm" data-odo="${esc(v.plate)}">Update km</button>${v.driver ? `<span class="foot">Driver: ${esc(v.driver)}</span>` : ''}</div>
+      ${vehTrips(v)}
+      <div class="vsec"><span>Maintenance</span></div>
+      <table>${rows.map(x => `<tr class="click" data-svc="${esc(x.name)}" data-plate="${esc(v.plate)}">
+        <td><b>${esc(x.name)}</b><small>${x.done ? 'Last: ' + fmtD(x.done.date) + (x.done.odo !== '' ? ' · ' + km(x.done.odo) : '') : ''}</small></td>
+        <td>${x.sched ? 'Scheduled ' + fmtD(x.sched.date) : (x.nextDate || x.nextKm !== '' ? 'Next: ' + [x.nextDate && fmtD(x.nextDate), x.nextKm !== '' && km(x.nextKm)].filter(Boolean).join(' / ') : '')}<small>${x.sched ? '' : esc(dueText(x))}</small></td>
+        <td style="text-align:right"><span class="badge ${x.state}">${STATE_LBL[x.state]}</span></td></tr>`).join('')}</table>
+      ${none.length ? `<div class="norec">No record yet: ${esc(none.join(', '))}</div>` : ''}
+      ${lastRepair ? `<div class="norec">Last service: ${esc(lastRepair.service)} · ${fmtD(lastRepair.date)}</div>` : ''}
+      <div class="vf"><button class="btn sm" data-log="${esc(v.plate)}">🔧 Log service</button><button class="btn sm" data-hist="${esc(v.plate)}">History</button><button class="btn sm" data-editveh="${esc(v.plate)}">Edit</button></div>
+    </div>`;
+  }).join('') || '<div class="card empty">No vehicles yet. Click “＋ Add vehicle”.</div>';
+
+  // vehicle schedule & routes
+  const rng = $('#tripRange').value || '14';
+  const [from, to] = rng === 'past' ? [addDays(today, -31), addDays(today, -1)] : [today, addDays(today, +rng - 1)];
+  const tl = trips.filter(t => (!vf.plate || t.vehicle === vf.plate) && t.end >= from && t.start <= to)
+    .sort((a, b) => (rng === 'past' ? b.start.localeCompare(a.start) : a.start.localeCompare(b.start)) || byTime(a, b));
+  $('#tripCount').textContent = tl.length + ' trip' + (tl.length === 1 ? '' : 's');
+  $('#tripTable').innerHTML = `<thead><tr><th>Date</th><th>Time</th><th>Vehicle</th><th>Route</th><th>Activity</th><th>Team</th><th>Representative(s)</th><th>Status</th></tr></thead>
+    <tbody>${tl.map(t => `<tr data-act="${esc(t.id)}" ${t.start <= today && t.end >= today ? 'style="background:#fff8e1"' : ''}>
+      <td><b>${fmtDate(t.start)}</b>${t.end !== t.start ? '<div class="foot">to ' + fmtDate(t.end) + '</div>' : ''}</td>
+      <td>${t.startTime ? fmtTime(t.startTime) + (t.endTime ? ' – ' + fmtTime(t.endTime) : '') : '—'}</td>
+      <td>${esc(vName(t.vehicle))}<div class="foot">${esc(t.vehicle)}</div></td>
+      <td><b>${esc(t.route || '—')}</b></td><td>${esc(t.title)}<div class="foot">${esc(t.type)}</div></td>
+      <td>${t.team ? `<span class="tag" style="--tc:${teamColor(t.team)}">${esc(t.team)}</span>` : ''}</td>
+      <td>${esc(t.reps.join(', '))}</td><td><span class="badge ${esc(t.status)}">${esc(t.status)}</span></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No trips in this period. Tick “Vehicle needed” when adding an activity.</td></tr>'}</tbody>`;
+
+  // maintenance log
+  const vb = Object.fromEntries(S.vehicles.map(v => [v.plate, v]));
+  const logs = S.maint.filter(m => (!vf.plate || m.plate === vf.plate) && (!vf.svc || m.service === vf.svc) && (!vf.status || m.status === vf.status) && (!vf.year || m.date.slice(0, 4) === vf.year))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  $('#logCount').textContent = logs.length + ' record' + (logs.length === 1 ? '' : 's');
+  $('#logTable').innerHTML = `<thead><tr><th>Date</th><th>Vehicle</th><th>Service</th><th class="num">Odometer</th><th>Shop / mechanic</th><th>Next due</th><th>Rep</th><th>Status</th></tr></thead>
+    <tbody>${logs.map(m => `<tr data-mx="${esc(m.id)}"><td>${fmtD(m.date)}</td><td>${esc((vb[m.plate] || {}).name || m.plate)}<div class="foot">${esc(m.plate)}</div></td>
+      <td>${esc(m.service)}${m.notes ? `<div class="foot">${esc(m.notes)}</div>` : ''}</td><td class="num">${m.odo !== '' ? m.odo.toLocaleString() : '—'}</td><td>${esc(m.shop)}</td>
+      <td>${esc([m.nextDate && fmtD(m.nextDate), m.nextKm !== '' && km(m.nextKm)].filter(Boolean).join(' / ')) || '<span class="foot">auto</span>'}</td>
+      <td>${esc(m.rep)}</td><td><span class="badge ${esc(m.status)}">${esc(m.status)}</span></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No records.</td></tr>'}</tbody>`;
+}
+
+/* ---------- trips (activities that use a vehicle) ---------- */
+const vName = p => (S.vehicles.find(v => v.plate === p) || {}).name || p;
+function tripsOf(plate) { return S.acts.filter(a => a.vehicle && (!plate || a.vehicle === plate) && a.status !== 'Cancelled'); }
+function vehTrips(v) {
+  const today = todayStr(), list = tripsOf(v.plate).filter(t => t.end >= today && t.status !== 'Done').sort((a, b) => a.start.localeCompare(b.start) || byTime(a, b));
+  const nowTrip = list.find(t => t.start <= today);
+  return `<div class="vsec"><span>Schedule &amp; routes</span><span>${nowTrip ? '🟢 On schedule today' : list.length ? list.length + ' upcoming' : 'Available'}</span></div>` +
+    (list.slice(0, 5).map(t => `<div class="trip ${t.start <= today ? 'today' : ''}" data-act="${esc(t.id)}">
+      <div class="when">${t.start <= today ? 'Today' : fmtDate(t.start)}<small>${t.startTime ? fmtTime(t.startTime) : 'All day'}${t.end !== t.start ? ' · to ' + fmtDate(t.end, { month: 'short', day: 'numeric' }) : ''}</small></div>
+      <div class="rt">${esc(t.route || t.title)}<small>${esc([t.title !== t.route && t.title, t.reps.join(', ')].filter(Boolean).join(' · '))}</small></div></div>`).join('') ||
+      '<div class="norec">No trips scheduled.</div>') + (list.length > 5 ? `<div class="norec">+${list.length - 5} more — see schedule table below</div>` : '');
+}
+
+/* ====================== ACTIVITY DETAIL / DAY ====================== */
+function openEvent(id) {
+  if (id.startsWith('M:')) { openMx(S.maint.find(m => m.id === id.slice(2))); return; }
+  if (id.startsWith('D:')) { const [plate, service] = id.slice(2).split('|'); const x = allDue().find(d => d.v.plate === plate && d.name === service); openMx(null, { plate, service, date: x ? x.nextDate : todayStr(), status: 'Scheduled' }); return; }
+  const a = S.acts.find(x => x.id === id); if (!a) return; S.current = a;
+  $('#detDot').style.background = colorOf(a.type);
+  $('#detTitle').textContent = a.title;
+  const rows = [
+    ['Whose activity', a.team], ['Activity', a.type],
+    ['Date', fmtDate(a.start, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (a.end !== a.start ? ' → ' + fmtDate(a.end, { weekday: 'long', month: 'long', day: 'numeric' }) : '')],
+    ['Time', a.startTime ? fmtTime(a.startTime) + (a.endTime ? ' – ' + fmtTime(a.endTime) : '') : 'All day'],
+    [isOff(a.type) ? 'Who' : 'Representative(s)', a.reps.join(', ')], ['Leave type', a.leaveType], ['Reason', a.reason],
+    ['Vehicle', a.vehicle ? '🚚 ' + vName(a.vehicle) + ' (' + a.vehicle + ')' : ''], ['Route', a.route],
+    ['Quantity', a.qty !== '' ? a.qty + ' ' + a.unit : ''], ['Location', a.location], ['Status', a.status], ['Notes', a.notes], ['Last updated', [a.updatedBy, a.updatedAt].filter(Boolean).join(' · ')]
+  ];
+  $('#detBody').innerHTML = rows.filter(r => r[1]).map(r => `<div class="row"><span>${r[0]}</span><span>${r[0] === 'Status' ? `<span class="badge ${esc(r[1])}">${esc(r[1])}</span>` : esc(r[1]).replace(/\n/g, '<br>')}</span></div>`).join('');
+  $('#doneBtn').style.display = a.status === 'Done' ? 'none' : '';
+  show('#detOv');
+}
+function openDay(day) {
+  const evs = on(calEvents().filter(e => passes(e)), day);
+  $('#dayTitle').textContent = fmtDate(day, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  $('#dayBody').innerHTML = evs.map(a => evCard(a, true)).join('<div style="height:6px"></div>') || '<div class="foot">No activities.</div>';
+  $('#dayAdd').onclick = () => { hide('#dayOv'); openForm({ start: day }); };
+  show('#dayOv');
+}
+
+/* ====================== ACTIVITY FORM ====================== */
+const ACT_TEAMS = () => S.lists.teams.map(t => t.name);
+function openForm(pre, editing) {
+  S.editing = editing || null;
+  const fm = $('#form');
+  fm.reset();
+  fm.team.innerHTML = ACT_TEAMS().map(t => `<option>${esc(t)}</option>`).join('');
+  fm.team.value = pre.team || repTeam(S.me) || ACT_TEAMS()[0];
+  const sel = new Set(pre.reps || (S.me && !editing ? [S.me] : []));
+  $('#repBox').innerHTML = Object.entries(repTree()).flatMap(([t, secs]) => Object.entries(secs).map(([s, names]) =>
+    `<div><div class="grp">${esc(t + (s !== 'General' ? ' › ' + s : ''))}</div><div class="row">${names.map(n =>
+    `<label><input type="checkbox" value="${esc(n)}" ${sel.has(n) ? 'checked' : ''}> ${esc(n)}</label>`).join('')}</div></div>`)).join('');
+  $('#dows').innerHTML = DOW.map((d, i) => `<label><input type="checkbox" value="${i}"> ${d.slice(0, 3)}</label>`).join('');
+  fillTypes(pre.type);
+  const p = Object.assign({ status: 'Scheduled' }, pre);
+  fm.vehicle.innerHTML = '<option value="">— select vehicle —</option>' + S.vehicles.map(v => `<option value="${esc(v.plate)}">${esc(v.name)} (${esc(v.plate)})${v.status !== 'Active' ? ' – ' + esc(v.status) : ''}</option>`).join('');
+  $('#routeList').innerHTML = [...new Set(S.acts.map(a => a.route).filter(Boolean))].map(r => `<option>${esc(r)}</option>`).join('');
+  ['title', 'start', 'end', 'startTime', 'endTime', 'qty', 'unit', 'location', 'status', 'notes', 'vehicle', 'route', 'leaveType', 'reason'].forEach(k => { if (p[k] !== undefined && p[k] !== null) fm[k].value = p[k]; });
+  fm.needVeh.checked = !!p.vehicle;
+  $('#repeatWrap').style.display = editing ? 'none' : '';
+  toggleRepeat(); repLabel(); offToggle(); vehToggle();
+  $('#formTitle').textContent = editing ? 'Edit activity' : 'Add activity';
+  $('#formMsg').textContent = '';
+  show('#formOv');
+  setTimeout(() => fm.title.focus(), 50);
+}
+function fillTypes(keep) {
+  const fm = $('#form'), team = fm.team.value;
+  const types = S.lists.types.filter(t => !t.team || t.team === team).map(t => t.name);
+  if (keep && !types.includes(keep)) types.unshift(keep);
+  fm.type.innerHTML = types.map(t => `<option>${esc(t)}</option>`).join('');
+  if (keep) fm.type.value = keep;
+}
+const REPS_OPTIONAL = t => t === 'Slaughterhouse' || t === 'Growing';
+const OFF_TYPES = ['Rest Day', 'Leave'];
+const isOff = t => OFF_TYPES.includes(t);
+function offToggle() {
+  const fm = $('#form'), t = fm.type.value, off = isOff(t);
+  fm.classList.toggle('isoff', off);
+  $('#leaveTypeWrap').style.display = t === 'Leave' ? '' : 'none';
+  $('#reasonLabel').textContent = t === 'Leave' ? 'Reason *' : 'Reason (optional)';
+  $('#titleLabel').textContent = off ? 'Title (optional — filled in automatically)' : 'Title / description (blank = activity name)';
+  fm.title.placeholder = off ? 'e.g. Sick Leave – Juan' : 'e.g. Customer pick-up – Pik&Pak';
+  repLabel();
+}
+function vehConflicts(plate, start, end, ignoreId) {
+  return S.acts.filter(a => a.vehicle === plate && a.id !== ignoreId && a.status !== 'Cancelled' && a.start <= end && a.end >= start);
+}
+function vehWarnings() {
+  const fm = $('#form'), plate = fm.vehicle.value, w = [];
+  if (!fm.needVeh.checked || !plate) return w;
+  const v = S.vehicles.find(x => x.plate === plate) || {};
+  const start = fm.start.value, end = fm.end.value && fm.end.value >= start ? fm.end.value : start;
+  if (v.status && v.status !== 'Active') w.push(`Vehicle is marked “${v.status}”.`);
+  vehicleServices(v).filter(x => x.state === 'overdue').forEach(x => w.push(`${x.name} is overdue (${dueText(x)}).`));
+  if (start) vehConflicts(plate, start, end, S.editing).forEach(a => w.push(`Already booked ${fmtDate(a.start)}${a.startTime ? ' ' + fmtTime(a.startTime) : ''}: ${a.route || a.title} (${a.reps.join(', ') || a.team}).`));
+  return w;
+}
+function vehToggle() {
+  const fm = $('#form'); $('.vbox').classList.toggle('on', fm.needVeh.checked);
+  const w = vehWarnings();
+  $('#vehWarn').innerHTML = w.length ? w.map(x => '<div class="warn">⚠ ' + esc(x) + '</div>').join('') : (fm.needVeh.checked && fm.vehicle.value ? '<span style="color:var(--green);font-weight:600">✔ Vehicle is available</span>' : '');
+}
+function repLabel() {
+  if (isOff($('#form').type.value)) { $('#repLabel').textContent = 'Who is on ' + ($('#form').type.value === 'Leave' ? 'leave' : 'rest day') + '? *'; return; }
+  $('#repLabel').textContent = REPS_OPTIONAL($('#form').team.value) ? 'Sales / MCP representative(s) involved (optional)' : 'Representative(s) * — tick everyone involved'; }
+function toggleRepeat() {
+  const fm = $('#form'), onR = fm.repeat.value === 'weekly';
+  $('#dows').style.display = onR ? 'flex' : 'none';
+  $('#untilWrap').style.display = onR ? 'inline' : 'none';
+  if (onR && !document.querySelector('#dows input:checked') && fm.start.value) document.querySelector(`#dows input[value="${pd(fm.start.value).getDay()}"]`).checked = true;
+}
+async function save() {
+  const fm = $('#form'), msg = $('#formMsg');
+  const reps = $$('#repBox input:checked').map(i => i.value);
+  const it = {
+    team: fm.team.value, type: fm.type.value, title: fm.title.value.trim(), start: fm.start.value,
+    end: fm.end.value && fm.end.value >= fm.start.value ? fm.end.value : fm.start.value,
+    startTime: fm.startTime.value, endTime: fm.endTime.value, reps,
+    qty: fm.qty.value === '' ? '' : Number(fm.qty.value), unit: fm.unit.value.trim(), location: fm.location.value.trim(),
+    status: fm.status.value, notes: fm.notes.value.trim(), vehicle: '', route: '', leaveType: '', reason: ''
+  };
+  const off = isOff(it.type);
+  if (!it.start || !it.type) { msg.textContent = 'Please fill in activity and start date.'; return; }
+  if (off) {
+    Object.assign(it, { startTime: '', endTime: '', qty: '', unit: '', location: '', reason: fm.reason.value.trim(), leaveType: it.type === 'Leave' ? fm.leaveType.value : '' });
+    if (!reps.length) { msg.textContent = 'Tick who is on ' + (it.type === 'Leave' ? 'leave' : 'rest day') + '.'; return; }
+    if (it.type === 'Leave' && (!it.leaveType || !it.reason)) { msg.textContent = 'Leave needs a leave type and a reason.'; return; }
+    if (!it.title) it.title = (it.leaveType || 'Rest Day') + ' – ' + reps.join(', ');
+  } else {
+    if (!it.title) it.title = it.type;
+    if (!reps.length && !REPS_OPTIONAL(it.team)) { msg.textContent = 'Tick at least one representative.'; return; }
+    if (fm.needVeh.checked) {
+      it.vehicle = fm.vehicle.value; it.route = fm.route.value.trim();
+      if (!it.vehicle || !it.route) { msg.textContent = 'Choose the vehicle and enter the route.'; return; }
+      const w = vehWarnings();
+      if (w.length && !confirm('Vehicle check:\n\n• ' + w.join('\n• ') + '\n\nSave anyway?')) return;
+    }
+  }
+  if (!S.me) { msg.textContent = 'Pick your name at the top (“I am”) first so the sheet records who made the change.'; return; }
+  const btn = $('#saveBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin dk"></span> Saving';
+  try {
+    let n = 1;
+    if (S.editing) await api('Activities', 'update', { item: Object.assign({ id: S.editing }, it) });
+    else if (fm.repeat.value === 'weekly') {
+      const days = $$('#dows input:checked').map(i => +i.value), until = fm.until.value;
+      if (!days.length || !until || until < it.start) throw new Error('Choose weekdays and an “until” date after the start date.');
+      const span = daysBetween(it.start, it.end), items = [];
+      for (let d = it.start; d <= until; d = addDays(d, 1)) if (days.includes(pd(d).getDay())) items.push(Object.assign({}, it, { start: d, end: addDays(d, span) }));
+      if (items.length > 120) throw new Error('That creates ' + items.length + ' entries — use a shorter range (max 120).');
+      await api('Activities', 'add', { items }); n = items.length;
+    } else await api('Activities', 'add', { items: [it] });
+    hide('#formOv');
+    toast(S.editing ? 'Activity updated' : n > 1 ? n + ' activities added' : 'Activity added');
+    S.cursor = it.start; renderAll();
+  } catch (e) { msg.textContent = '⚠ ' + e.message; }
+  btn.disabled = false; btn.textContent = 'Save';
+}
+
+/* ====================== VEHICLE FORMS ====================== */
+function openVeh(v) {
+  const fm = $('#vform'); fm.reset(); S.editing = v ? v.id : null;
+  fm.team.innerHTML = '<option value="">—</option>' + ACT_TEAMS().map(t => `<option>${esc(t)}</option>`).join('');
+  if (v) ['plate', 'name', 'vtype', 'team', 'driver', 'odo', 'status', 'notes'].forEach(k => fm[k].value = v[k]);
+  fm.plate.readOnly = !!v;
+  $('#vehTitle').textContent = v ? 'Edit vehicle' : 'Add vehicle';
+  $('#vDel').style.display = v ? '' : 'none'; $('#vMsg').textContent = '';
+  show('#vehOv');
+}
+async function saveVeh() {
+  const fm = $('#vform'), msg = $('#vMsg');
+  const it = { plate: fm.plate.value.trim().toUpperCase(), name: fm.name.value.trim(), vtype: fm.vtype.value.trim(), team: fm.team.value, driver: fm.driver.value.trim(), odo: num(fm.odo.value), status: fm.status.value, notes: fm.notes.value.trim() };
+  if (!it.plate || !it.name) { msg.textContent = 'Plate no. and vehicle name are required.'; return; }
+  if (!S.editing && S.vehicles.some(v => v.plate === it.plate)) { msg.textContent = 'That plate number already exists.'; return; }
+  if (!S.me) { msg.textContent = 'Pick your name at the top (“I am”) first.'; return; }
+  try {
+    if (S.editing) await api('Vehicles', 'update', { item: Object.assign({ id: S.editing }, it) });
+    else await api('Vehicles', 'add', { items: [it] });
+    hide('#vehOv'); toast('Vehicle saved');
+  } catch (e) { msg.textContent = '⚠ ' + e.message; }
+}
+function openMx(m, pre) {
+  const fm = $('#mform'); fm.reset(); S.editing = m ? m.id : null;
+  if (!S.vehicles.length) { toast('Add a vehicle first'); openVeh(); return; }
+  fm.plate.innerHTML = S.vehicles.map(v => `<option value="${esc(v.plate)}">${esc(v.name)} (${esc(v.plate)})</option>`).join('');
+  fm.service.innerHTML = S.lists.services.map(s => `<option>${esc(s.name)}</option>`).join('');
+  fm.rep.innerHTML = repOptions('', '—');
+  const p = Object.assign({ date: todayStr(), status: 'Done', rep: S.me }, pre || {}, m || {});
+  if (p.plate && !S.vehicles.some(v => v.plate === p.plate)) fm.plate.insertAdjacentHTML('afterbegin', `<option>${esc(p.plate)}</option>`);
+  if (p.service && !S.lists.services.some(s => s.name === p.service)) fm.service.insertAdjacentHTML('afterbegin', `<option>${esc(p.service)}</option>`);
+  ['plate', 'service', 'date', 'status', 'odo', 'shop', 'rep', 'nextDate', 'nextKm', 'notes'].forEach(k => { if (p[k] !== undefined && p[k] !== null) fm[k].value = p[k]; });
+  $('#shopList').innerHTML = [...new Set(S.maint.map(x => x.shop).filter(Boolean))].map(s => `<option>${esc(s)}</option>`).join('');
+  $('#mxTitle').textContent = m ? 'Edit service record' : 'Log vehicle service';
+  $('#mDel').style.display = m ? '' : 'none'; $('#mMsg').textContent = '';
+  mxHints(); show('#mxOv');
+}
+function mxHints() {
+  const fm = $('#mform'), v = S.vehicles.find(x => x.plate === fm.plate.value), s = S.lists.services.find(x => x.name === fm.service.value);
+  $('#odoHint').textContent = v && v.odo !== '' ? 'Current: ' + km(v.odo) : '';
+  $('#intHint').textContent = s && (s.km || s.months)
+    ? `Leave “next due” blank to use the standard interval: every ${[s.km && s.km.toLocaleString() + ' km', s.months && s.months + ' month' + (s.months > 1 ? 's' : '')].filter(Boolean).join(' or ')} (whichever comes first).`
+    : 'No standard interval for this service — fill in “next due” if you want a reminder.';
+}
+async function saveMx() {
+  const fm = $('#mform'), msg = $('#mMsg');
+  const it = { plate: fm.plate.value, service: fm.service.value, date: fm.date.value, status: fm.status.value, odo: num(fm.odo.value), shop: fm.shop.value.trim(), rep: fm.rep.value, nextDate: fm.nextDate.value, nextKm: num(fm.nextKm.value), notes: fm.notes.value.trim() };
+  if (!it.plate || !it.service || !it.date) { msg.textContent = 'Vehicle, service and date are required.'; return; }
+  if (!S.me) { msg.textContent = 'Pick your name at the top (“I am”) first.'; return; }
+  const v = S.vehicles.find(x => x.plate === it.plate);
+  if (it.status === 'Done' && it.odo === '' && !confirm('No odometer reading entered. km-based reminders need it. Save anyway?')) return;
+  if (v && it.odo !== '' && v.odo !== '' && it.odo < v.odo - 50000) { msg.textContent = 'Odometer looks too low compared with the current reading — please check.'; return; }
+  try {
+    if (S.editing) await api('Maintenance', 'update', { item: Object.assign({ id: S.editing }, it) });
+    else await api('Maintenance', 'add', { items: [it] });
+    hide('#mxOv'); toast('Service record saved');
+  } catch (e) { msg.textContent = '⚠ ' + e.message; }
+}
+async function updateOdo(plate) {
+  const v = S.vehicles.find(x => x.plate === plate); if (!v) return;
+  if (!S.me) { toast('Pick your name at the top (“I am”) first'); return; }
+  const val = prompt(`Current odometer for ${v.name} (${v.plate})`, v.odo === '' ? '' : v.odo);
+  if (val === null || val.trim() === '') return;
+  const n = Number(val.replace(/,/g, ''));
+  if (isNaN(n) || n < 0) { toast('Enter a number'); return; }
+  try { await api('Vehicles', 'update', { item: Object.assign({}, v, { odo: n }) }); toast('Odometer updated'); } catch (e) { toast('⚠ ' + e.message, 4000); }
+}
+
+/* ====================== MODALS ====================== */
+function show(s) { $(s).classList.add('show'); }
+function hide(s) { $(s).classList.remove('show'); }
+$$('.ov').forEach(o => o.addEventListener('click', e => { if (e.target === o || e.target.closest('[data-close]')) o.classList.remove('show'); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('.ov.show').forEach(o => o.classList.remove('show')); });
+
+/* ====================== EVENTS ====================== */
+function setPage(p) { S.page = p; store.set('page', p); renderAll(); }
+$('#pageTabs').onclick = e => { const b = e.target.closest('button'); if (b) setPage(b.dataset.p); };
+$('#view').addEventListener('click', e => {
+  const ch = e.target.closest('[data-id]'); if (ch) { openEvent(ch.dataset.id); return; }
+  const more = e.target.closest('[data-day]'); if (more) { openDay(more.dataset.day); return; }
+  const hd = e.target.closest('.week .hd'); if (hd) { openDay(hd.dataset.date); return; }
+  const td = e.target.closest('td[data-date]'); if (td) openForm({ start: td.dataset.date });
+});
+document.querySelector('aside').addEventListener('click', e => {
+  const m = e.target.closest('[data-id]'); if (m) { openEvent(m.dataset.id); return; }
+  const v = e.target.closest('[data-veh]'); if (v) { S.vf.plate = v.dataset.veh; setPage('veh'); }
+});
+$('#dayBody').addEventListener('click', e => { const m = e.target.closest('[data-id]'); if (m) { hide('#dayOv'); openEvent(m.dataset.id); } });
+
+function shift(dir) {
+  if (S.view === 'week') S.cursor = addDays(S.cursor, 7 * dir);
+  else { const c = pd(S.cursor); S.cursor = ds(new Date(c.getFullYear(), c.getMonth() + dir, 1)); }
+  renderView(); renderAside();
+}
+$('#prevBtn').onclick = () => shift(-1);
+$('#nextBtn').onclick = () => shift(1);
+$('#todayBtn').onclick = () => { S.cursor = todayStr(); renderView(); renderAside(); };
+$('#viewTabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.view = b.dataset.v; store.set('view', S.view); renderAll(); };
+
+function saveFilters() { const { q, ...keep } = S.f; store.set('filters', keep); }
+function setFilter(k, v) { S.f[k] = v; saveFilters(); renderAll(); }
+$('#teamPills').onclick = e => {
+  const b = e.target.closest('[data-team]'); if (!b) return;
+  const t = b.dataset.team, all = allTeams();
+  if (e.detail === 2 || e.ctrlKey || e.metaKey) S.f.teams = [t];               // double-click / ctrl-click = only this team
+  else S.f.teams = S.f.teams.includes(t) ? S.f.teams.filter(x => x !== t) : S.f.teams.concat(t);
+  if (!S.f.teams.length) S.f.teams = all;
+  saveFilters(); renderAll();
+};
+$('#fMine').onchange = e => setFilter('mine', e.target.checked);
+$('#fQ').oninput = e => { S.f.q = e.target.value; renderView(); renderAside(); };
+$('#clearBtn').onclick = () => { S.f = Object.assign({}, DEF_F, { teams: allTeams() }); $('#fQ').value = ''; saveFilters(); renderAll(); };
+$('#legend').onclick = e => { const s = e.target.closest('[data-t]'); if (s) { const t = s.dataset.t; setFilter('types', S.f.types.includes(t) ? S.f.types.filter(x => x !== t) : S.f.types.concat(t)); } };
+$('#meSel').onchange = e => { S.me = e.target.value; store.set('me', S.me); if (!S.me) S.f.mine = false; renderAll(); };
+
+$('#addBtn').onclick = () => {
+  if (S.page === 'veh') { openMx(null, S.vf.plate ? { plate: S.vf.plate } : {}); return; }
+  openForm({ start: S.cursor.slice(0, 7) !== todayStr().slice(0, 7) ? S.cursor : todayStr() });
+};
+$('#saveBtn').onclick = save;
+$('#form').addEventListener('submit', e => { e.preventDefault(); save(); });
+$('#form').repeat.onchange = toggleRepeat;
+$('#form').start.onchange = toggleRepeat;
+$('#form').team.onchange = () => { fillTypes(); repLabel(); };
+$('#form').type.addEventListener('change', offToggle);
+['needVeh', 'vehicle', 'start', 'end'].forEach(n => $('#form')[n].addEventListener('change', vehToggle));
+$('#tripTable').addEventListener('click', e => { const r = e.target.closest('[data-act]'); if (r) openEvent(r.dataset.act); });
+$('#tripRange').onchange = () => renderVehicles();
+
+$('#editBtn').onclick = () => { const a = S.current; hide('#detOv'); openForm(a, a.id); };
+$('#dupBtn').onclick = () => { const a = S.current; hide('#detOv'); const { id, updatedBy, updatedAt, ...copy } = a; openForm(Object.assign(copy, { status: 'Scheduled' })); };
+$('#doneBtn').onclick = async () => {
+  if (!S.me) { toast('Pick your name at the top (“I am”) first'); return; }
+  try { await api('Activities', 'update', { item: Object.assign({}, S.current, { status: 'Done' }) }); hide('#detOv'); toast('Marked as done'); } catch (e) { toast('⚠ ' + e.message, 4000); }
+};
+$('#delBtn').onclick = async () => {
+  if (!confirm('Delete “' + S.current.title + '”?')) return;
+  try { await api('Activities', 'delete', { id: S.current.id }); hide('#detOv'); toast('Activity deleted'); } catch (e) { toast('⚠ ' + e.message, 4000); }
+};
+
+// vehicles page
+$('#vfVeh').onchange = e => { S.vf.plate = e.target.value; renderVehicles(); };
+$('#vfSvc').onchange = e => { S.vf.svc = e.target.value; renderVehicles(); };
+$('#vfStatus').onchange = e => { S.vf.status = e.target.value; renderVehicles(); };
+$('#vfYear').onchange = e => { S.vf.year = e.target.value; renderVehicles(); };
+$('#vClear').onclick = () => { S.vf = { plate: '', svc: '', status: '', year: '' }; renderVehicles(); };
+$('#addVehBtn').onclick = () => openVeh();
+$('#vgrid').addEventListener('click', e => {
+  const tr = e.target.closest('[data-act]'); if (tr) { openEvent(tr.dataset.act); return; }
+  const t = e.target.closest('[data-odo],[data-log],[data-hist],[data-editveh],[data-svc]'); if (!t) return;
+  const d = t.dataset;
+  if (d.odo) updateOdo(d.odo);
+  else if (d.log) openMx(null, { plate: d.log });
+  else if (d.hist) { S.vf.plate = d.hist; renderVehicles(); $('#logTable').scrollIntoView({ behavior: 'smooth' }); }
+  else if (d.editveh) openVeh(S.vehicles.find(v => v.plate === d.editveh));
+  else if (d.svc) {
+    const x = vehicleServices(S.vehicles.find(v => v.plate === d.plate)).find(s => s.name === d.svc);
+    if (x && x.sched) openMx(x.sched); else openMx(null, { plate: d.plate, service: d.svc });
+  }
+});
+$('#logTable').addEventListener('click', e => { const r = e.target.closest('[data-mx]'); if (r) openMx(S.maint.find(m => m.id === r.dataset.mx)); });
+$('#vSave').onclick = saveVeh;
+$('#vDel').onclick = async () => {
+  const v = S.vehicles.find(x => x.id === S.editing); if (!v) return;
+  if (!confirm(`Delete vehicle ${v.name} (${v.plate})? Its service records stay in the log.`)) return;
+  try { await api('Vehicles', 'delete', { id: v.id }); hide('#vehOv'); toast('Vehicle deleted'); } catch (e) { $('#vMsg').textContent = '⚠ ' + e.message; }
+};
+$('#mSave').onclick = saveMx;
+$('#mDel').onclick = async () => {
+  if (!confirm('Delete this service record?')) return;
+  try { await api('Maintenance', 'delete', { id: S.editing }); hide('#mxOv'); toast('Record deleted'); } catch (e) { $('#mMsg').textContent = '⚠ ' + e.message; }
+};
+$('#mform').plate.onchange = mxHints;
+$('#mform').service.onchange = mxHints;
+
+$('#refreshBtn').onclick = () => load();
+$('#printBtn').onclick = () => window.print();
+$('#settingsBtn').onclick = () => { $('#sApi').value = store.get('api', ''); $('#sPin').value = S.pin; $('#sRef').value = S.refreshMin; show('#setOv'); };
+$('#setSave').onclick = () => {
+  const url = $('#sApi').value.trim();
+  store.set('api', url); S.api = url || CONFIG.API_URL;
+  S.pin = $('#sPin').value; store.set('pin', S.pin);
+  S.refreshMin = Math.max(0, Number($('#sRef').value) || 0); store.set('refresh', S.refreshMin);
+  hide('#setOv'); S.acts = []; startTimer(); load();
+};
+function startTimer() {
+  clearInterval(S.timer);
+  if (S.refreshMin > 0) S.timer = setInterval(() => { if (!document.hidden && !document.querySelector('.ov.show')) load(true); }, S.refreshMin * 60000);
+}
+
+/* ====================== DEMO DATA ====================== */
+const DEMO = (() => {
+  const SH = 'Slaughtering – Market Hogs', DL = 'Carcass Delivery @ MCP', SL = 'Slaughterhouse', cc = ['Jobert Jumawan', 'Evine Jake Aperocho'];
+  const r = (id, start, end, t, team, type, title, reps, qty, unit, location, status, notes) =>
+    ({ id, start, end: end || start, startTime: t, team, type, title, reps, qty, unit, location, status, notes });
+  return {
+    lists: {
+      reps: [['Daisy Joy Directo', 'Management', 'Department Manager'], ['Juan Miguel Decena', 'Sales', 'Swine & MCP Sales'], ['Nilbert Ampong', 'Sales', 'Swine & MCP Sales'], ['Jazztinemur Gaid', 'Sales', 'Swine & MCP Sales'], ['Reshell Requina', 'Sales', 'Customer Account'], ['Shynna Marie Asares', 'Sales', 'Customer Account'], ['Barbie Joy Puyos', 'Sales', 'Poultry'], ['Sheila Soronio', 'Sales', 'Poultry'], ['Gueengel Bagongon', 'Sales', 'Poultry'], ['Herleen Jabiniao', 'Sales', 'Poultry'], ['Raffygy Lano', 'Sales', 'Poultry'], ['Jeevee Ann Alenton', 'Sales', 'Poultry'], ['Rodolfo Orongan Jr.', 'MCP', 'Production'], ['Franklin Padillo', 'MCP', 'Production'], ['Albert Sala', 'MCP', 'Production'], ['William Papasin Jr.', 'MCP', 'Production'], ['Rhyan Libuntas', 'MCP', 'Production'], ['Kevin John Guillermo', 'MCP', 'Production'], ['John Raymond Adenola', 'MCP', 'Production'], ['Evine Jake Aperocho', 'MCP', 'Cold Chain – Stockman'], ['Jobert Jumawan', 'MCP', 'Cold Chain – Stockman'], ['Gilbert Teofilo', 'MCP', 'Receiving & Dispatching'], ['Orland Eduave', 'MCP', 'Receiving & Dispatching'], ['Almer Mante', 'MCP', 'Utility & Sanitation'], ['Kim Niel Cutor', 'MCP', 'Utility & Sanitation'], ['Gigie Gamayon', 'MCP', 'Utility & Sanitation'], ['Cholla Mae Tadle', 'MCP', 'Utility & Sanitation'], ['Jessamae Escoto', 'MCP', 'Admin'], ['Camille Ondiano', 'MCP', 'Admin']].map(([name, team, section]) => ({ name, team, section })),
+      types: [['Customer Visit', '#BFDBFE', 'Sales'], ['Customer Pick-up', '#F8CBAD', 'Sales'], ['Malaybalay Delivery', '#A8DCD1', 'Sales'],
+        ['Collection', '#FDE68A', 'Sales'], ['Order Taking / Pre-order', '#DDD6FE', 'Sales'],
+        ['Carcass Receiving', '#F4B183', 'MCP'], ['Fabrication', '#C9C3EF', 'MCP'], ['Dispatch / Releasing', '#FBCFE8', 'MCP'],
+        ['Inventory Count', '#D9B3E6', 'MCP'], ['Sanitation / Deep Clean', '#BAE6FD', 'MCP'],
+        ['Slaughtering – Market Hogs', '#A9D08E', SL], ['Slaughtering – Cattle', '#FFE699', SL], ['Slaughtering – Culled Sow', '#9BC2E6', SL],
+        ['Carcass Delivery @ MCP', '#F4B183', SL], ['Rest Day / Downtime', '#FFFF00', SL],
+        ['Grower Farm Visit', '#FCD9B6', 'Growing'], ['Piglet / Weanling Loading', '#E9D5A1', 'Growing'], ['Hog Harvest / Hauling', '#D6C29A', 'Growing'], ['Feed Delivery to Growers', '#F3E8C8', 'Growing'],
+        ['Rest Day', '#E2E8F0', ''], ['Leave', '#FECDD3', ''],
+        ['Meeting / Training', '#D0D5DB', ''], ['Other', '#E7E6E6', '']].map(([name, color, team]) => ({ name, color, team })),
+      teams: [{ name: 'Sales', color: '#2563EB' }, { name: 'MCP', color: '#7C3AED' }, { name: 'Slaughterhouse', color: '#16A34A' }, { name: 'Growing', color: '#B45309' }],
+      services: [['PMS / Change Oil', 5000, 3], ['Brake Pads / Shoes', 20000, 12], ['Brake Fluid', 40000, 24], ['Tire Rotation', 10000, 6],
+        ['Tire Replacement', 50000, 36], ['Battery', 0, 24], ['Aircon / Reefer Unit Service', 0, 6], ['LTO Registration', 0, 12],
+        ['Insurance Renewal', 0, 12], ['Repair', 0, 0], ['Other', 0, 0]].map(([name, km, months]) => ({ name, km, months }))
+    },
+    acts: [
+      r('S1', '2026-10-24', '', '', SL, SH, 'Slaughtering 60 heads market hogs', [], 60, 'heads', 'Slaughterhouse', 'Done', ''),
+      r('S2', '2026-10-26', '', '04:00', SL, DL, 'Delivery of pork @ MCP', cc, '', '', 'MCP', 'Done', '4:00 AM arrival'),
+      r('S3', '2026-10-26', '', '', SL, SH, 'Slaughtering 60 heads market hogs', [], 60, 'heads', 'Slaughterhouse', 'Done', ''),
+      r('S4', '2026-10-27', '', '04:00', SL, DL, 'Delivery of pork @ MCP', cc, '', '', 'MCP', 'Done', '4:00 AM arrival'),
+      r('S5', '2026-10-27', '', '', SL, 'Slaughtering – Cattle', 'Slaughtering 5 heads cattle', [], 5, 'heads', 'Slaughterhouse', 'Done', ''),
+      r('S6', '2026-10-28', '', '08:00', SL, DL, 'Delivery of beef @ MCP', cc, '', '', 'MCP', 'Done', '8:00 AM arrival'),
+      r('S7', '2026-10-29', '', '', SL, 'Slaughtering – Culled Sow', 'Slaughtering 20 heads culled sow', [], 20, 'heads', 'Slaughterhouse', 'Done', ''),
+      r('S8', '2026-10-30', '', '08:00', SL, DL, 'Delivery of culled sow @ MCP', cc, '', '', 'MCP', 'Done', '8:00 AM arrival'),
+      r('S9', '2026-10-31', '', '', SL, SH, 'Slaughtering 60 heads market hogs', [], 60, 'heads', 'Slaughterhouse', 'Done', ''),
+      r('S10', '2026-11-02', '', '04:00', SL, DL, 'Delivery of pork @ MCP', cc, '', '', 'MCP', 'Done', '4:00 AM arrival'),
+      r('S11', '2026-11-02', '', '', SL, SH, 'Slaughtering 60 heads market hogs', [], 60, 'heads', 'Slaughterhouse', 'Done', ''),
+      r('S12', '2026-11-03', '', '08:00', SL, DL, 'Delivery of pork @ MCP', cc, '', '', 'MCP', 'Done', '8:00 AM arrival'),
+      r('S13', '2026-11-04', '2026-11-07', '', SL, 'Rest Day / Downtime', 'Rest day + downtime', [], '', '', 'Slaughterhouse', 'Done', ''),
+      r('S14', '2026-11-05', '2026-11-07', '', 'MCP', 'Inventory Count', 'MCP physical inventory', ['Jobert Jumawan', 'Evine Jake Aperocho', 'Daisy Joy Directo'], '', '', 'MCP', 'Done', ''),
+      r('S15', '2026-11-08', '2026-11-11', '', SL, 'Rest Day / Downtime', 'Rest day + downtime', [], '', '', 'Slaughterhouse', 'Scheduled', ''),
+      r('S16', '2026-11-09', '', '08:00', 'MCP', 'Meeting / Training', 'MCP Dashboard go-live', ['Daisy Joy Directo', 'Jessamae Escoto', 'Camille Ondiano'], '', '', 'MCP', 'Scheduled', ''),
+      r('S17', '2026-11-12', '', '', SL, SH, 'Slaughtering 60 heads market hogs', [], 60, 'heads', 'Slaughterhouse', 'Scheduled', ''),
+      r('S18', '2026-11-13', '', '08:00', SL, DL, 'Delivery of pork @ MCP', cc, '', '', 'MCP', 'Scheduled', '8:00 AM arrival'),
+      Object.assign(r('S19', '2026-11-09', '', '06:00', 'Sales', 'Malaybalay Delivery', 'Malaybalay delivery – meatshops', ['Nilbert Ampong'], '', '', 'Malaybalay', 'Scheduled', ''), { vehicle: 'SAMPLE-02', route: 'MCP → Malaybalay (Pik&Pak, NVM) → MCP' }),
+      Object.assign(r('S20', '2026-11-10', '', '05:30', 'MCP', 'Dispatch / Releasing', 'Chilled pork dispatch', ['Jobert Jumawan', 'Gilbert Teofilo'], '', '', 'Valencia', 'Scheduled', ''), { vehicle: 'SAMPLE-01', route: 'MCP → Valencia → Maramag → MCP' }),
+      Object.assign(r('S21', '2026-11-11', '', '06:00', 'Sales', 'Malaybalay Delivery', 'Malaybalay delivery – meatshops', ['Nilbert Ampong'], '', '', 'Malaybalay', 'Scheduled', ''), { vehicle: 'SAMPLE-02', route: 'MCP → Malaybalay (Pik&Pak, NVM) → MCP' }),
+      Object.assign(r('S22', '2026-11-10', '2026-11-11', '', 'Sales', 'Leave', 'Vacation Leave – Reshell Requina', ['Reshell Requina'], '', '', '', 'Scheduled', ''), { leaveType: 'Vacation Leave', reason: 'Family event (sample)' }),
+      r('S23', '2026-11-08', '', '', 'MCP', 'Rest Day', 'Rest Day – Albert Sala', ['Albert Sala'], '', '', '', 'Scheduled', '')
+    ],
+    vehicles: [
+      { id: 'V1', plate: 'SAMPLE-01', name: 'Reefer Van 1 (sample)', vtype: 'Reefer Van', team: 'MCP', driver: 'Jobert Jumawan', odo: 44700, status: 'Active', notes: 'Replace with real unit' },
+      { id: 'V2', plate: 'SAMPLE-02', name: 'Delivery Truck (sample)', vtype: 'Truck', team: 'Sales', driver: 'Nilbert Ampong', odo: 61250, status: 'Active', notes: 'Replace with real unit' }
+    ],
+    maint: [
+      { id: 'M1', date: '2026-08-20', plate: 'SAMPLE-01', service: 'PMS / Change Oil', odo: 40000, shop: 'Casa', status: 'Done', rep: 'Jobert Jumawan' },
+      { id: 'M2', date: '2026-01-15', plate: 'SAMPLE-01', service: 'Brake Pads / Shoes', odo: 25000, shop: 'Casa', status: 'Done', rep: 'Jobert Jumawan' },
+      { id: 'M3', date: '2026-07-01', plate: 'SAMPLE-02', service: 'PMS / Change Oil', odo: 55000, shop: 'Talyer', status: 'Done', rep: 'Nilbert Ampong' },
+      { id: 'M4', date: '2026-11-14', plate: 'SAMPLE-02', service: 'Brake Pads / Shoes', odo: '', shop: 'Talyer', status: 'Scheduled', rep: 'Nilbert Ampong', notes: 'Squeaking front brakes' }
+    ]
+  };
 })();
+
+/* ====================== START ====================== */
+load();
+startTimer();
 </script>
 </body>
 </html>
