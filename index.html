@@ -132,7 +132,7 @@ main{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:14px 18px 30p
 table.month{width:100%;border-collapse:collapse;table-layout:fixed}
 table.month th{background:#e9efeb;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:8px 4px;color:#33463b;border:1px solid var(--line)}
 table.month th.wk{width:92px;background:var(--brand2);color:#fff}
-table.month td{border:1px solid var(--line);vertical-align:top;height:118px;padding:3px;cursor:pointer}
+table.month td{border:1px solid var(--line);vertical-align:top;height:110px;padding:3px;cursor:pointer}
 table.month td:hover{background:#f7faf8}
 table.month td.out{background:#f6f7f7;color:#a5b0aa}
 table.month td.out .chip{opacity:.55}
@@ -147,6 +147,17 @@ table.month td.wk b{font-size:17px;color:var(--brand)}
 .chip.cancelled,.ev.cancelled .t{text-decoration:line-through;opacity:.6}
 .chip.overdue,.ev.overdue{outline:1.5px solid var(--red)}
 .more{font-size:11px;color:var(--brand2);font-weight:700;padding:0 4px}
+/* month cards */
+.mev{display:block;border-radius:6px;padding:4px 6px 5px;margin-bottom:3px;border-left:4px solid var(--tc,#999);color:#1d2a23;font-size:11.5px;line-height:1.3;cursor:pointer}
+.mev:hover{filter:brightness(.96)}
+.mev .t{font-weight:700;overflow-wrap:break-word}
+.mev .t b{font-weight:800}
+.mev .g{font-size:10.5px;color:#33463b;margin-top:2px;overflow-wrap:break-word}
+.mev .g i{font-style:normal;background:rgba(255,255,255,.65);border-radius:4px;padding:0 4px;margin:1px 3px 0 0;display:inline-block;max-width:100%;white-space:normal}
+.mev .r{font-size:10.5px;color:#33463b;margin-top:2px;overflow-wrap:break-word}
+.mev.mine .t::before{content:"★ ";color:var(--me)}
+.mev.cancelled .t{text-decoration:line-through;opacity:.6}
+.mev.overdue{outline:1.5px solid var(--red)}
 /* week */
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 .ev .m{overflow-wrap:break-word}
@@ -858,6 +869,30 @@ function chip(a) {
   const icon = a.kind === 'due' ? '⚠ ' : a.kind === 'mx' ? '🔧 ' : (a.status === 'Done' ? '✔ ' : '') + (a.type === 'Leave' ? '🏖 ' : a.type === 'Rest Day' ? '🛌 ' : a.vehicle ? '🚚 ' : '');
   return `<span class="chip ${evClass(a)}" data-id="${esc(a.id)}" title="${esc(tip)}" style="background:${colorOf(a.type)};${tStyle(a)}">${icon}${a.startTime ? '<b>' + fmtTime(a.startTime) + '</b> ' : ''}${esc(a.title)}</span>`;
 }
+// Summarise people by group: 2+ from the same section -> "Section (n)", 1 person -> their name
+function groupSummary(a) {
+  if (!a.reps.length) return '';
+  if (isOff(a.type) || a.kind === 'due') return a.reps.map(n => `<i>${esc(n)}</i>`).join('');
+  const groups = new Map();
+  a.reps.forEach(n => {
+    const r = S.lists.reps.find(x => x.name === n);
+    const g = r ? (r.section && r.section !== 'General' ? r.section : r.team) : 'Others';
+    if (!groups.has(g)) groups.set(g, []); groups.get(g).push(n);
+  });
+  return [...groups].map(([g, ns]) => {
+    const total = S.lists.reps.filter(r => (r.section && r.section !== 'General' ? r.section : r.team) === g).length;
+    if (ns.length === 1) return `<i title="${esc(g)}">${esc(ns[0])}</i>`;
+    return `<i title="${esc(ns.join(', '))}">${esc(g)} (${ns.length === total && total > 1 ? 'all ' : ''}${ns.length})</i>`;
+  }).join('');
+}
+function monthCard(a) {
+  const icon = a.kind === 'due' ? '⚠ ' : a.kind === 'mx' ? '🔧 ' : (a.status === 'Done' ? '✔ ' : '') + (a.type === 'Leave' ? '🏖 ' : a.type === 'Rest Day' ? '🛌 ' : a.vehicle ? '🚚 ' : '');
+  const tip = `${a.title}\n${a.team ? a.team + ' · ' : ''}${a.type}${a.reps.length ? '\n' + a.reps.join(', ') : ''}${a.location ? '\n@ ' + a.location : ''}${a.notes ? '\n' + a.notes : ''}`;
+  const extra = [a.qty !== '' && a.qty + ' ' + a.unit, a.vehicle && a.route && '🚚 ' + a.route, a.kind === 'due' && a.notes].filter(Boolean).join(' · ');
+  return `<div class="mev ${evClass(a)}" data-id="${esc(a.id)}" title="${esc(tip)}" style="background:${colorOf(a.type)};${tStyle(a)}">
+    <div class="t">${icon}${a.startTime ? '<b>' + fmtTime(a.startTime) + '</b> · ' : ''}${esc(a.title)}</div>
+    ${a.reps.length ? `<div class="g">${groupSummary(a)}</div>` : ''}${extra ? `<div class="r">${esc(extra)}</div>` : ''}</div>`;
+}
 function evCard(a, withDate) {
   const meta = [a.reps.join(', '), a.location && '@ ' + a.location, a.qty !== '' && a.qty + ' ' + a.unit, a.vehicle && '🚚 ' + vName(a.vehicle) + (a.route ? ': ' + a.route : '')].filter(Boolean).join(' · ');
   return `<div class="ev ${evClass(a)}" data-id="${esc(a.id)}" style="background:${colorOf(a.type)};${tStyle(a)}">
@@ -886,7 +921,7 @@ function renderView() {
       for (let i = 0; i < 7; i++) {
         const evs = on(list, day), d = pd(day), max = 4;
         const cls = [d.getMonth() !== c.getMonth() && 'out', day === today && 'today'].filter(Boolean).join(' ');
-        h += `<td class="${cls}" data-date="${day}"><span class="dn">${d.getDate()}</span>${evs.slice(0, max).map(chip).join('')}${evs.length > max ? `<span class="more" data-day="${day}">+${evs.length - max} more</span>` : ''}</td>`;
+        h += `<td class="${cls}" data-date="${day}"><span class="dn">${d.getDate()}</span>${evs.map(monthCard).join('')}</td>`;
         day = addDays(day, 1);
       }
       h += `<td class="wk">${weekTotal(list, ws)}</td></tr>`;
