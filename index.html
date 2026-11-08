@@ -11,6 +11,7 @@ body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-s
 button,input,select,textarea{font:inherit}
 header{background:var(--brand);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 header h1{font-size:18px;margin:0}
+@media (max-width:1500px){header .sub{display:none}}
 header .sub{font-size:12px;opacity:.8}
 .sp{flex:1}
 .ptabs{display:flex;gap:4px;background:rgba(0,0,0,.18);padding:3px;border-radius:10px}
@@ -50,6 +51,40 @@ header .sub{font-size:12px;opacity:.8}
 .trip .rt{font-weight:700}.trip .rt small{display:block;font-weight:400;color:var(--muted)}
 .trip.today{background:#fff8e1}
 .vsec{padding:8px 14px 2px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between}
+/* repeat / dates */
+.rmode{margin:2px 0 8px;width:max-content;max-width:100%;flex-wrap:wrap}
+.rbox{display:none;background:#f6f9f7;border:1px solid var(--line);border-radius:10px;padding:10px;gap:8px;flex-direction:column}
+#repeatWrap[data-r=weekly] #rWeekly,#repeatWrap[data-r=dates] #rDates{display:flex}
+.qp{display:flex;gap:5px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);font-weight:700}
+.qp button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 10px;font-weight:700;cursor:pointer;font-size:12px}
+.qp button:hover{background:#eaf4ee}
+.rline{font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.rline select,.rline input{width:auto!important;padding:5px 7px!important}
+.mcal{max-width:330px}
+.mcal .mh2{display:flex;align-items:center;justify-content:space-between;font-weight:700;margin-bottom:4px}
+.mcal .mh2 button{border:1px solid var(--line);background:#fff;border-radius:6px;width:28px;height:26px;cursor:pointer}
+.mcal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.mcal .g span{font-size:10.5px;text-align:center;color:var(--muted);font-weight:700}
+.mcal .g button{border:1px solid transparent;background:#fff;border-radius:6px;height:32px;cursor:pointer;font-size:13px}
+.mcal .g button:hover{border-color:var(--brand2)}
+.mcal .g button.on{background:var(--brand);color:#fff;font-weight:700}
+.mcal .g button.td{border-color:var(--accent)}
+.mcal .g button.pad{visibility:hidden}
+.picked{display:flex;gap:4px;flex-wrap:wrap}
+.picked span{background:var(--brand);color:#fff;border-radius:999px;padding:2px 4px 2px 9px;font-size:12px;font-weight:600}
+.picked span b{cursor:pointer;margin-left:4px;padding:0 4px}
+.rprev{font-size:12px;color:#33463b;margin-top:6px}
+#form.rdates .datef{display:none}
+/* history */
+.hsel{border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fff}
+.htable td{vertical-align:top}
+.htable .who{font-weight:700}
+.htable .chg{font-size:12px;color:#33463b;white-space:pre-wrap;word-break:break-word}
+.act-Added{background:#d3f9d8;color:var(--green)}.act-Edited{background:#e7f0ff;color:#1c4fbf}.act-Deleted,.act-Permanently{background:#ffe3e3;color:var(--red)}
+.act-Restored{background:#fff3bf;color:var(--amber)}.act-Lists{background:#f3e8ff;color:#7c3aed}
+.rechist{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.rechist h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;color:var(--muted)}
+.rechist div{font-size:12px;padding:4px 0;border-bottom:1px dashed var(--line)}
 /* manage lists */
 .modal.wide{max-width:860px}
 .lbody{padding:12px 18px;max-height:60vh;overflow:auto}
@@ -242,9 +277,10 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
   </div>
   <div class="sp"></div>
   <div class="whoami">I am <select id="meSel" title="Pick your name to highlight your activities"></select></div>
-  <button class="btn ghost" id="refreshBtn" title="Reload from Google Sheet">⟳ Refresh</button>
+  <button class="btn ghost" id="refreshBtn" title="Reload from Google Sheet">⟳</button>
   <button class="btn ghost" id="printBtn" title="Print">🖨</button>
   <button class="btn ghost" id="listsBtn" title="Add or edit names and activities">👥 Lists</button>
+  <button class="btn ghost" id="histBtn" title="Trash and edit log">🕘 History <span class="hidden" id="trashCnt" style="background:#fff;color:var(--brand);border-radius:99px;font-size:11px;padding:1px 6px;margin-left:3px"></span></button>
   <button class="btn ghost" id="settingsBtn" title="Settings">⚙</button>
   <button class="btn primary" id="addBtn">＋ Add activity</button>
 </header>
@@ -326,8 +362,8 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
         <div class="f"><label id="reasonLabel">Reason *</label><textarea name="reason" placeholder="e.g. Family event in Cagayan de Oro"></textarea></div>
       </div></div>
       <div class="f full"><label id="titleLabel">Title / description *</label><input name="title" placeholder="e.g. Customer pick-up – Pik&Pak"></div>
-      <div class="f"><label>Start date *</label><input type="date" name="start" required></div>
-      <div class="f"><label>End date (multi-day)</label><input type="date" name="end"></div>
+      <div class="f datef"><label>Start date *</label><input type="date" name="start" required></div>
+      <div class="f datef"><label>End date (multi-day)</label><input type="date" name="end"></div>
       <div class="f work"><label>Start / departure time</label><input type="time" name="startTime"></div>
       <div class="f work"><label>End / return time</label><input type="time" name="endTime"></div>
       <div class="f full"><label id="repLabel">Representative(s) *</label><div class="reps" id="repBox"></div></div>
@@ -345,12 +381,20 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
       <div class="f"><label>Status</label><select name="status"><option>Scheduled</option><option>Done</option><option>Postponed</option><option>Cancelled</option></select></div>
       <div class="f full"><label>Notes</label><textarea name="notes" placeholder="Arrival time, reminders…"></textarea></div>
       <div class="f full" id="repeatWrap">
-        <label>Repeat</label>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <select name="repeat" style="width:auto"><option value="">Does not repeat</option><option value="weekly">Weekly on…</option></select>
+        <label>Dates — once, a pattern, or picked dates</label>
+        <input type="hidden" name="repeat">
+        <div class="tabs rmode" id="rMode"><button type="button" data-r="">Once</button><button type="button" data-r="weekly">🔁 Pattern (MWF, TTh…)</button><button type="button" data-r="dates">📅 Pick specific dates</button></div>
+        <div class="rbox" id="rWeekly">
+          <div class="qp"><span>Quick:</span><button type="button" data-q="1,3,5">MWF</button><button type="button" data-q="2,4">TTh</button><button type="button" data-q="1,2,3,4,5">Mon–Fri</button><button type="button" data-q="1,2,3,4,5,6">Mon–Sat</button><button type="button" data-q="0,1,2,3,4,5,6">Daily</button><button type="button" data-q="0,6">Sat–Sun</button></div>
           <div class="dows" id="dows"></div>
-          <span id="untilWrap" style="display:none;font-size:12.5px">until <input type="date" name="until" style="width:auto"></span>
+          <div class="rline">Every <select name="every"><option value="1">week</option><option value="2">2 weeks</option><option value="3">3 weeks</option><option value="4">4 weeks</option></select>
+            from the start date until <input type="date" name="until"></div>
         </div>
+        <div class="rbox" id="rDates">
+          <div class="mcal" id="mcal"></div>
+          <div class="picked" id="picked"></div>
+        </div>
+        <div class="rprev" id="rPreview"></div>
       </div>
     </form>
     <div class="mf">
@@ -433,6 +477,22 @@ table.log tfoot td{font-weight:700;background:#f6f9f7}
   </div>
 </div>
 
+<!-- history: trash + edit log -->
+<div class="ov" id="histOv">
+  <div class="modal wide" style="max-width:1000px">
+    <div class="mh"><h2>History</h2><button class="btn sm" data-close>✕</button></div>
+    <div style="padding:12px 18px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="tabs" id="hTabs"><button data-h="trash">🗑 Trash</button><button data-h="log">📜 Edit log</button></div>
+      <select id="hUser" class="hsel"></select>
+      <select id="hAction" class="hsel"></select>
+      <select id="hType" class="hsel"></select>
+      <input type="search" id="hSearch" placeholder="Search…" style="border:1px solid var(--line);border-radius:8px;padding:7px 9px;flex:1;min-width:140px">
+    </div>
+    <div class="lbody" id="hBody" style="max-height:65vh"></div>
+    <div class="mf"><span class="foot sp" id="hMsg"></span><button class="btn danger" id="hEmpty">Empty trash</button><button class="btn" data-close>Close</button></div>
+  </div>
+</div>
+
 <!-- manage lists -->
 <div class="ov" id="lstOv">
   <div class="modal wide">
@@ -493,7 +553,7 @@ const S = {
   vf: { plate: '', svc: '', status: '', year: '' },
   me: store.get('me', ''), api: store.get('api', '') || CONFIG.API_URL, pin: store.get('pin', ''),
   refreshMin: store.get('refresh', CONFIG.AUTO_REFRESH_MIN),
-  demo: false, lastSync: null, editing: null, current: null, timer: null
+  demo: false, lastSync: null, editing: null, current: null, timer: null, picked: new Set(), mcal: '', trash: [], log: [], htab: 'trash', hlimit: 200
 };
 
 /* ====================== DATES ====================== */
@@ -692,36 +752,24 @@ async function load(silent) {
     S.acts = (j.activities || []).filter(a => a.start).map(normAct);
     S.vehicles = (j.vehicles || []).filter(v => v.plate).map(normVeh);
     S.maint = (j.maintenance || []).filter(m => m.plate).map(normMx);
+    S.trash = j.trash || []; S.log = j.log || [];
     const L = j.lists || {};
     S.lists = { reps: L.reps || [], types: L.types || [], teams: L.teams || [], services: L.services || [] };
     S.lastSync = new Date();
-    store.set('cache', { acts: S.acts, vehicles: S.vehicles, maint: S.maint, lists: S.lists, t: Date.now() });
+    store.set('cache', { acts: S.acts, vehicles: S.vehicles, maint: S.maint, lists: S.lists, trash: S.trash, log: S.log.slice(0, 200), t: Date.now() });
     banner('');
   } catch (e) {
     const c = store.get('cache', null);
-    if (c) { S.acts = c.acts; S.vehicles = c.vehicles || []; S.maint = c.maint || []; S.lists = c.lists; S.lastSync = new Date(c.t); }
+    if (c) { S.acts = c.acts; S.vehicles = c.vehicles || []; S.maint = c.maint || []; S.lists = c.lists; S.trash = c.trash || []; S.log = c.log || []; S.lastSync = new Date(c.t); }
     banner('Could not reach the Google Sheet (' + esc(e.message) + '). ' + (c ? 'Showing the last saved copy.' : ''));
   }
-  btn.innerHTML = '⟳ Refresh';
+  btn.innerHTML = '⟳';
   fillLists(); renderAll();
 }
 function banner(html) { const b = $('#banner'); b.innerHTML = html; b.style.display = html ? 'block' : 'none'; }
 
 async function api(table, action, payload) {
-  if (S.demo) {
-    const key = { Activities: 'acts', Vehicles: 'vehicles', Maintenance: 'maint' }[table];
-    const nz = { Activities: normAct, Vehicles: normVeh, Maintenance: normMx }[table];
-    const stamp = o => Object.assign({}, o, { updatedBy: S.me, updatedAt: new Date().toLocaleString() });
-    if (action === 'add') (payload.items || [payload.item]).forEach(it => S[key].push(nz(stamp(Object.assign({}, it, { id: 'D' + Math.random().toString(36).slice(2, 8) })))));
-    if (action === 'update') S[key] = S[key].map(a => a.id === payload.item.id ? nz(stamp(payload.item)) : a);
-    if (action === 'delete') S[key] = S[key].filter(a => a.id !== payload.id);
-    if (table === 'Maintenance') {
-      const it = payload.item || (payload.items || [])[0];
-      const v = it && S.vehicles.find(x => x.plate === it.plate);
-      if (v && it.odo !== '' && (v.odo === '' || Number(it.odo) > v.odo)) v.odo = Number(it.odo);
-    }
-    fillLists(); renderAll(); return { ok: true };
-  }
+  if (S.demo) { demoApi(table, action, payload); fillLists(); renderAll(); return { ok: true }; }
   const r = await fetch(S.api, { method: 'POST', body: JSON.stringify(Object.assign({ table, action, pin: S.pin, user: S.me }, payload)) });
   const j = await r.json();
   if (!j.ok) throw new Error(j.error || 'Save failed');
@@ -750,6 +798,8 @@ function renderHeader() {
   const a = $('#vAlert'); a.textContent = od + soon; a.classList.toggle('hidden', !(od + soon));
   a.style.background = od ? 'var(--red)' : 'var(--amber)';
   $('#repList').innerHTML = S.lists.reps.map(r => `<option>${esc(r.name)}</option>`).join('');
+  const tc = $('#trashCnt'); tc.textContent = S.trash.length; tc.classList.toggle('hidden', !S.trash.length);
+  if ($('#histOv').classList.contains('show')) renderHistory();
 }
 
 /* ====================== RENDER: CALENDAR ====================== */
@@ -979,7 +1029,7 @@ function openEvent(id) {
     ['Vehicle', a.vehicle ? '🚚 ' + vName(a.vehicle) + ' (' + a.vehicle + ')' : ''], ['Route', a.route],
     ['Quantity', a.qty !== '' ? a.qty + ' ' + a.unit : ''], ['Location', a.location], ['Status', a.status], ['Notes', a.notes], ['Last updated', [a.updatedBy, a.updatedAt].filter(Boolean).join(' · ')]
   ];
-  $('#detBody').innerHTML = rows.filter(r => r[1]).map(r => `<div class="row"><span>${r[0]}</span><span>${r[0] === 'Status' ? `<span class="badge ${esc(r[1])}">${esc(r[1])}</span>` : esc(r[1]).replace(/\n/g, '<br>')}</span></div>`).join('');
+  $('#detBody').innerHTML = rows.filter(r => r[1]).map(r => `<div class="row"><span>${r[0]}</span><span>${r[0] === 'Status' ? `<span class="badge ${esc(r[1])}">${esc(r[1])}</span>` : esc(r[1]).replace(/\n/g, '<br>')}</span></div>`).join('') + recordHistory(a.id);
   $('#doneBtn').style.display = a.status === 'Done' ? 'none' : '';
   show('#detOv');
 }
@@ -1004,6 +1054,7 @@ function openForm(pre, editing) {
     `<div><div class="grp">${esc(t + (s !== 'General' ? ' › ' + s : ''))}</div><div class="row">${names.map(n =>
     `<label><input type="checkbox" value="${esc(n)}" ${sel.has(n) ? 'checked' : ''}> ${esc(n)}</label>`).join('')}</div></div>`)).join('');
   $('#dows').innerHTML = DOW.map((d, i) => `<label><input type="checkbox" value="${i}"> ${d.slice(0, 3)}</label>`).join('');
+  S.picked = new Set(); fm.repeat.value = '';
   fillTypes(pre.type);
   const p = Object.assign({ status: 'Scheduled' }, pre);
   fm.vehicle.innerHTML = '<option value="">— select vehicle —</option>' + S.vehicles.map(v => `<option value="${esc(v.plate)}">${esc(v.name)} (${esc(v.plate)})${v.status !== 'Active' ? ' – ' + esc(v.status) : ''}</option>`).join('');
@@ -1046,7 +1097,8 @@ function vehWarnings() {
   const start = fm.start.value, end = fm.end.value && fm.end.value >= start ? fm.end.value : start;
   if (v.status && v.status !== 'Active') w.push(`Vehicle is marked “${v.status}”.`);
   vehicleServices(v).filter(x => x.state === 'overdue').forEach(x => w.push(`${x.name} is overdue (${dueText(x)}).`));
-  if (start) vehConflicts(plate, start, end, S.editing).forEach(a => w.push(`Already booked ${fmtDate(a.start)}${a.startTime ? ' ' + fmtTime(a.startTime) : ''}: ${a.route || a.title} (${a.reps.join(', ') || a.team}).`));
+  const span = start ? daysBetween(start, end) : 0, seen = new Set();
+  (S.editing ? [start] : repeatDates()).filter(Boolean).forEach(d => vehConflicts(plate, d, addDays(d, fm.repeat.value === 'dates' ? 0 : span), S.editing).forEach(a => { if (seen.has(a.id)) return; seen.add(a.id); w.push(`Already booked ${fmtDate(a.start)}${a.startTime ? ' ' + fmtTime(a.startTime) : ''}: ${a.route || a.title} (${a.reps.join(', ') || a.team}).`); }));
   return w;
 }
 function vehToggle() {
@@ -1057,14 +1109,57 @@ function vehToggle() {
 function repLabel() {
   if (isOff($('#form').type.value)) { $('#repLabel').textContent = 'Who is on ' + ($('#form').type.value === 'Leave' ? 'leave' : 'rest day') + '? *'; return; }
   $('#repLabel').textContent = REPS_OPTIONAL($('#form').team.value) ? 'Sales / MCP representative(s) involved (optional)' : 'Representative(s) * — tick everyone involved'; }
-function toggleRepeat() {
-  const fm = $('#form'), onR = fm.repeat.value === 'weekly';
-  $('#dows').style.display = onR ? 'flex' : 'none';
-  $('#untilWrap').style.display = onR ? 'inline' : 'none';
-  if (onR && !document.querySelector('#dows input:checked') && fm.start.value) document.querySelector(`#dows input[value="${pd(fm.start.value).getDay()}"]`).checked = true;
+function setRepeat(mode) {
+  const fm = $('#form'); fm.repeat.value = mode;
+  $('#repeatWrap').dataset.r = mode;
+  fm.classList.toggle('rdates', mode === 'dates');
+  $$('#rMode button').forEach(b => b.classList.toggle('on', b.dataset.r === mode));
+  if (mode === 'weekly') {
+    if (!$$('#dows input:checked').length && fm.start.value) $(`#dows input[value="${pd(fm.start.value).getDay()}"]`).checked = true;
+    if (!fm.until.value && fm.start.value) fm.until.value = addMonths(fm.start.value, 1);
+  }
+  if (mode === 'dates') {
+    if (!S.picked.size && fm.start.value) S.picked.add(fm.start.value);
+    S.mcal = (fm.start.value || todayStr()).slice(0, 7);
+    renderMcal();
+  }
+  repeatPreview(); vehToggle();
+}
+function toggleRepeat() { setRepeat($('#form').repeat.value || ''); }
+// Returns the list of start dates this form will create (one per activity)
+function repeatDates() {
+  const fm = $('#form'), mode = fm.repeat.value, start = fm.start.value;
+  if (mode === 'dates') return [...S.picked].sort();
+  if (mode === 'weekly') {
+    const days = $$('#dows input:checked').map(i => +i.value), until = fm.until.value, every = +fm.every.value || 1;
+    if (!start || !until || until < start || !days.length) return [];
+    const w0 = weekStart(start), out = [];
+    for (let d = start; d <= until && out.length <= 400; d = addDays(d, 1))
+      if (days.includes(pd(d).getDay()) && (Math.round(daysBetween(w0, weekStart(d)) / 7) % every === 0)) out.push(d);
+    return out;
+  }
+  return start ? [start] : [];
+}
+function repeatPreview() {
+  const fm = $('#form'), mode = fm.repeat.value, el = $('#rPreview');
+  if (!mode) { el.textContent = ''; return; }
+  const ds_ = repeatDates();
+  if (!ds_.length) { el.innerHTML = '<span class="warn">No dates selected yet.</span>'; return; }
+  const f = d => fmtDate(d, { weekday: 'short', month: 'short', day: 'numeric' });
+  const list = ds_.length <= 8 ? ds_.map(f).join(', ') : ds_.slice(0, 6).map(f).join(', ') + ' … ' + f(ds_[ds_.length - 1]);
+  el.innerHTML = `<b>Creates ${ds_.length} activit${ds_.length === 1 ? 'y' : 'ies'}:</b> ${esc(list)}${ds_.length > 120 ? ' <span class="warn">— too many (max 120)</span>' : ''}`;
+}
+function renderMcal() {
+  const [y, m] = S.mcal.split('-').map(Number), first = new Date(y, m - 1, 1), days = new Date(y, m, 0).getDate(), today = todayStr();
+  let g = DOW.map(d => `<span>${d.slice(0, 2)}</span>`).join('') + '<button type="button" class="pad"></button>'.repeat(first.getDay());
+  for (let d = 1; d <= days; d++) { const k = y + '-' + pad(m) + '-' + pad(d); g += `<button type="button" data-d="${k}" class="${S.picked.has(k) ? 'on' : ''} ${k === today ? 'td' : ''}">${d}</button>`; }
+  $('#mcal').innerHTML = `<div class="mh2"><button type="button" data-mv="-1">‹</button><span>${MONTHS[m - 1]} ${y}</span><button type="button" data-mv="1">›</button></div><div class="g">${g}</div>`;
+  const ps = [...S.picked].sort();
+  $('#picked').innerHTML = ps.map(d => `<span>${fmtDate(d, { month: 'short', day: 'numeric' })}<b data-rm="${d}">×</b></span>`).join('') || '<span class="foot" style="background:none;color:var(--muted)">Tap days on the calendar to select them.</span>';
 }
 async function save() {
   const fm = $('#form'), msg = $('#formMsg');
+  if (fm.repeat.value === 'dates' && S.picked.size) { fm.start.value = [...S.picked].sort()[0]; fm.end.value = ''; }
   const reps = $$('#repBox input:checked').map(i => i.value);
   const it = {
     team: fm.team.value, type: fm.type.value, title: fm.title.value.trim(), start: fm.start.value,
@@ -1095,12 +1190,11 @@ async function save() {
   try {
     let n = 1;
     if (S.editing) await api('Activities', 'update', { item: Object.assign({ id: S.editing }, it) });
-    else if (fm.repeat.value === 'weekly') {
-      const days = $$('#dows input:checked').map(i => +i.value), until = fm.until.value;
-      if (!days.length || !until || until < it.start) throw new Error('Choose weekdays and an “until” date after the start date.');
-      const span = daysBetween(it.start, it.end), items = [];
-      for (let d = it.start; d <= until; d = addDays(d, 1)) if (days.includes(pd(d).getDay())) items.push(Object.assign({}, it, { start: d, end: addDays(d, span) }));
-      if (items.length > 120) throw new Error('That creates ' + items.length + ' entries — use a shorter range (max 120).');
+    else if (fm.repeat.value) {
+      const dates = repeatDates(), span = daysBetween(it.start, it.end);
+      if (!dates.length) throw new Error(fm.repeat.value === 'dates' ? 'Pick at least one date.' : 'Choose the days and an “until” date after the start date.');
+      if (dates.length > 120) throw new Error('That creates ' + dates.length + ' entries — use a shorter range (max 120).');
+      const items = dates.map(d => Object.assign({}, it, { start: d, end: addDays(d, fm.repeat.value === 'dates' ? 0 : span) }));
       await api('Activities', 'add', { items }); n = items.length;
     } else await api('Activities', 'add', { items: [it] });
     hide('#formOv');
@@ -1227,9 +1321,10 @@ async function saveLists() {
     if (dup) { msg.textContent = '⚠ Duplicate ' + lbl + ': ' + dup.name; return; }
   }
   if (L.reps.some(r => !r.team)) { msg.textContent = '⚠ Every name needs a team.'; return; }
+  if (!S.me) { msg.textContent = '⚠ Pick your name at the top (“I am”) first, so the edit log records who changed the lists.'; return; }
   const btn = $('#lSave'); btn.disabled = true; btn.innerHTML = '<span class="spin dk"></span> Saving';
   try {
-    if (S.demo) { S.lists = L; fillLists(); renderAll(); }
+    if (S.demo) { demoLog('Lists updated', 'Lists', '', 'Names / activities / services', 'Edited in demo'); S.lists = L; fillLists(); renderAll(); }
     else {
       const r = await fetch(S.api, { method: 'POST', body: JSON.stringify({ action: 'saveLists', lists: L, pin: S.pin, user: S.me }) });
       const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Save failed');
@@ -1238,6 +1333,100 @@ async function saveLists() {
     hide('#lstOv'); toast('Lists saved');
   } catch (e) { msg.textContent = '⚠ ' + e.message; }
   btn.disabled = false; btn.textContent = 'Save changes';
+}
+
+/* ====================== TRASH & EDIT LOG ====================== */
+const TABLE_KEY = { Activities: 'acts', Vehicles: 'vehicles', Maintenance: 'maint' };
+const TABLE_LBL = { Activities: 'Activity', Vehicles: 'Vehicle', Maintenance: 'Service record' };
+const TABLE_NZ = () => ({ Activities: normAct, Vehicles: normVeh, Maintenance: normMx });
+const FIELD_LBL = { start: 'Start Date', end: 'End Date', startTime: 'Start Time', endTime: 'End Time', team: 'Team', type: 'Activity', title: 'Title', reps: 'Representative(s)',
+  qty: 'Quantity', unit: 'Unit', location: 'Location', status: 'Status', notes: 'Notes', vehicle: 'Vehicle', route: 'Route', leaveType: 'Leave Type', reason: 'Reason',
+  plate: 'Plate No.', name: 'Vehicle', vtype: 'Type', driver: 'Driver', odo: 'Odometer', date: 'Date', service: 'Service', shop: 'Shop', nextDate: 'Next Due Date', nextKm: 'Next Due km', rep: 'Representative' };
+function summaryOf(table, o) {
+  if (table === 'Activities') return [o.start + (o.end && o.end !== o.start ? ' to ' + o.end : ''), o.type, o.title, [].concat(o.reps || []).join(', ')].filter(Boolean).join(' · ');
+  if (table === 'Vehicles') return [o.plate, o.name].filter(Boolean).join(' · ');
+  return [o.date, o.plate, o.service, o.status].filter(Boolean).join(' · ');
+}
+function nowStr() { const d = new Date(); return ds(d) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
+function demoLog(action, type, rid, summary, changes) { S.log.unshift({ at: nowStr(), user: S.me || 'Unknown', action, type, rid, summary, changes }); }
+const fv = v => [].concat(v == null ? '' : v).join(', ');
+function demoApi(table, action, p) {
+  const key = TABLE_KEY[table], nz = TABLE_NZ()[table];
+  const stamp = o => Object.assign({}, o, { updatedBy: S.me, updatedAt: nowStr().slice(0, 16) });
+  if (action === 'add') (p.items || [p.item]).forEach(it => {
+    const o = nz(stamp(Object.assign({}, it, { id: 'D' + Math.random().toString(36).slice(2, 8) }))); S[key].push(o);
+    demoLog('Added', TABLE_LBL[table], o.id, summaryOf(table, o), '');
+  });
+  if (action === 'update') {
+    const old = S[key].find(a => a.id === p.item.id), nw = nz(stamp(p.item));
+    const ch = Object.keys(FIELD_LBL).filter(k => k in nw && fv(old[k]) !== fv(nw[k])).map(k => `${FIELD_LBL[k]}: "${fv(old[k])}" → "${fv(nw[k])}"`).join('; ');
+    S[key] = S[key].map(a => a.id === nw.id ? nw : a);
+    demoLog('Edited', TABLE_LBL[table], nw.id, summaryOf(table, nw), ch || '(no change)');
+  }
+  if (action === 'delete') {
+    const o = S[key].find(a => a.id === p.id);
+    S[key] = S[key].filter(a => a.id !== p.id);
+    S.trash.unshift({ tid: 'T' + Math.random().toString(36).slice(2, 8), at: nowStr().slice(0, 16), by: S.me, type: TABLE_LBL[table], table, rid: o.id, summary: summaryOf(table, o), data: o });
+    demoLog('Deleted', TABLE_LBL[table], o.id, summaryOf(table, o), 'Moved to Trash');
+  }
+  if (table === 'Maintenance' && action !== 'delete') {
+    const it = p.item || (p.items || [])[0], v = it && S.vehicles.find(x => x.plate === it.plate);
+    if (v && it.odo !== '' && (v.odo === '' || Number(it.odo) > v.odo)) v.odo = Number(it.odo);
+  }
+}
+async function histApi(action, payload) {
+  if (S.demo) {
+    const pick = payload.all ? S.trash.slice() : S.trash.filter(t => (payload.tids || []).includes(t.tid));
+    pick.forEach(t => {
+      S.trash = S.trash.filter(x => x.tid !== t.tid);
+      if (action === 'restore') { S[TABLE_KEY[t.table]].push(TABLE_NZ()[t.table](t.data)); demoLog('Restored', t.type, t.rid, t.summary, 'Restored from Trash'); }
+      else demoLog('Permanently deleted', t.type, t.rid, t.summary, 'Removed from Trash');
+    });
+    fillLists(); renderAll(); return;
+  }
+  const r = await fetch(S.api, { method: 'POST', body: JSON.stringify(Object.assign({ action, pin: S.pin, user: S.me }, payload)) });
+  const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Failed');
+  await load(true);
+}
+function openHistory(tab) { S.htab = tab || S.htab; S.hlimit = 200; $('#hSearch').value = ''; $('#hMsg').textContent = ''; renderHistory(true); show('#histOv'); }
+function renderHistory(resetFilters) {
+  const t = S.htab, isT = t === 'trash';
+  $$('#hTabs button').forEach(b => b.classList.toggle('on', b.dataset.h === t));
+  $('#hTabs [data-h=trash]').textContent = '🗑 Trash' + (S.trash.length ? ' (' + S.trash.length + ')' : '');
+  $('#hEmpty').style.display = isT && S.trash.length ? '' : 'none';
+  const src = isT ? S.trash : S.log;
+  const users = [...new Set(src.map(x => isT ? x.by : x.user).filter(Boolean))].sort();
+  const acts = [...new Set(S.log.map(x => x.action))];
+  const types = [...new Set(src.map(x => x.type).filter(Boolean))];
+  const keep = id => resetFilters ? '' : $('#' + id).value;
+  const u0 = keep('hUser'), a0 = keep('hAction'), t0 = keep('hType');
+  $('#hUser').innerHTML = opt('', isT ? 'Deleted by: anyone' : 'Everyone', u0) + users.map(u => opt(u, u, u0)).join('');
+  $('#hAction').innerHTML = opt('', 'All actions', a0) + acts.map(a => opt(a, a, a0)).join('');
+  $('#hAction').style.display = isT ? 'none' : '';
+  $('#hType').innerHTML = opt('', 'All record types', t0) + types.map(x => opt(x, x, t0)).join('');
+  const u = $('#hUser').value, a = $('#hAction').value, ty = $('#hType').value, q = $('#hSearch').value.trim().toLowerCase();
+  const list = src.filter(x => (!u || (isT ? x.by : x.user) === u) && (isT || !a || x.action === a) && (!ty || x.type === ty) &&
+    (!q || [x.summary, x.changes, x.user, x.by, x.rid].join(' ').toLowerCase().includes(q)));
+  if (isT) {
+    $('#hBody').innerHTML = list.length ? `<p class="note">Deleted items stay here until someone restores them or deletes them forever.</p>
+      <table class="htable"><thead><tr><th>Deleted</th><th>By</th><th>Type</th><th>Item</th><th style="width:200px"></th></tr></thead><tbody>${list.map(x => `<tr>
+        <td>${esc(x.at)}</td><td class="who">${esc(x.by)}</td><td><span class="badge">${esc(x.type)}</span></td><td>${esc(x.summary)}</td>
+        <td style="text-align:right;white-space:nowrap"><button class="btn sm" data-restore="${esc(x.tid)}">↩ Restore</button> <button class="btn sm danger" data-purge="${esc(x.tid)}">Delete forever</button></td></tr>`).join('')}</tbody></table>`
+      : '<div class="empty">🗑 Trash is empty.</div>';
+  } else {
+    const shown = list.slice(0, S.hlimit);
+    $('#hBody').innerHTML = list.length ? `<p class="note">Every change made from the dashboard: who, when and what changed. Edits typed directly into the Google Sheet are not recorded here.</p>
+      <table class="htable"><thead><tr><th style="width:140px">When</th><th>Who</th><th>Action</th><th>Item</th><th>Changes</th></tr></thead><tbody>${shown.map(x => `<tr>
+        <td>${esc(x.at)}</td><td class="who">${esc(x.user)}</td><td><span class="badge act-${esc(x.action.split(' ')[0])}">${esc(x.action)}</span><div class="foot">${esc(x.type)}</div></td>
+        <td>${esc(x.summary)}</td><td class="chg">${esc((x.changes || '').replace(/; /g, '\n'))}</td></tr>`).join('')}</tbody></table>
+      ${list.length > shown.length ? `<div style="text-align:center;padding:10px"><button class="btn sm" data-more="1">Show more (${list.length - shown.length})</button></div>` : ''}`
+      : '<div class="empty">No log entries match.</div>';
+  }
+}
+function recordHistory(id) {
+  const rows = S.log.filter(x => x.rid === id).slice(0, 8);
+  if (!rows.length) return '';
+  return `<div class="rechist"><h4>History</h4>${rows.map(x => `<div><b>${esc(x.user)}</b> · ${esc(x.action.toLowerCase())} · <span class="foot">${esc(x.at)}</span>${x.changes && x.action === 'Edited' ? '<br><span class="foot">' + esc(x.changes) + '</span>' : ''}</div>`).join('')}</div>`;
 }
 
 /* ====================== MODALS ====================== */
@@ -1293,8 +1482,23 @@ $('#addBtn').onclick = () => {
 };
 $('#saveBtn').onclick = save;
 $('#form').addEventListener('submit', e => { e.preventDefault(); save(); });
-$('#form').repeat.onchange = toggleRepeat;
-$('#form').start.onchange = toggleRepeat;
+$('#rMode').onclick = e => { const b = e.target.closest('[data-r]'); if (b) setRepeat(b.dataset.r); };
+$('#rWeekly').addEventListener('click', e => {
+  const q = e.target.closest('[data-q]'); if (!q) return;
+  const set = q.dataset.q.split(',');
+  $$('#dows input').forEach(i => i.checked = set.includes(i.value));
+  repeatPreview(); vehToggle();
+});
+$('#rWeekly').addEventListener('change', () => { repeatPreview(); vehToggle(); });
+$('#form').start.addEventListener('change', () => { repeatPreview(); });
+$('#mcal').addEventListener('click', e => {
+  const mv = e.target.closest('[data-mv]');
+  if (mv) { const [y, m] = S.mcal.split('-').map(Number); const d = new Date(y, m - 1 + (+mv.dataset.mv), 1); S.mcal = d.getFullYear() + '-' + pad(d.getMonth() + 1); renderMcal(); return; }
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  S.picked.has(b.dataset.d) ? S.picked.delete(b.dataset.d) : S.picked.add(b.dataset.d);
+  renderMcal(); repeatPreview(); vehToggle();
+});
+$('#picked').addEventListener('click', e => { const x = e.target.closest('[data-rm]'); if (x) { S.picked.delete(x.dataset.rm); renderMcal(); repeatPreview(); vehToggle(); } });
 $('#form').team.onchange = () => { fillTypes(); repLabel(); };
 $('#form').type.addEventListener('change', offToggle);
 ['needVeh', 'vehicle', 'start', 'end'].forEach(n => $('#form')[n].addEventListener('change', vehToggle));
@@ -1308,8 +1512,9 @@ $('#doneBtn').onclick = async () => {
   try { await api('Activities', 'update', { item: Object.assign({}, S.current, { status: 'Done' }) }); hide('#detOv'); toast('Marked as done'); } catch (e) { toast('⚠ ' + e.message, 4000); }
 };
 $('#delBtn').onclick = async () => {
-  if (!confirm('Delete “' + S.current.title + '”?')) return;
-  try { await api('Activities', 'delete', { id: S.current.id }); hide('#detOv'); toast('Activity deleted'); } catch (e) { toast('⚠ ' + e.message, 4000); }
+  if (!S.me) { toast('Pick your name at the top (“I am”) first'); return; }
+  if (!confirm('Move “' + S.current.title + '” to Trash?\nYou can restore it from 🕘 History.')) return;
+  try { await api('Activities', 'delete', { id: S.current.id }); hide('#detOv'); toast('Moved to Trash'); } catch (e) { toast('⚠ ' + e.message, 4000); }
 };
 
 // vehicles page
@@ -1336,19 +1541,41 @@ $('#logTable').addEventListener('click', e => { const r = e.target.closest('[dat
 $('#vSave').onclick = saveVeh;
 $('#vDel').onclick = async () => {
   const v = S.vehicles.find(x => x.id === S.editing); if (!v) return;
-  if (!confirm(`Delete vehicle ${v.name} (${v.plate})? Its service records stay in the log.`)) return;
-  try { await api('Vehicles', 'delete', { id: v.id }); hide('#vehOv'); toast('Vehicle deleted'); } catch (e) { $('#vMsg').textContent = '⚠ ' + e.message; }
+  if (!S.me) { $('#vMsg').textContent = 'Pick your name at the top (“I am”) first.'; return; }
+  if (!confirm(`Move vehicle ${v.name} (${v.plate}) to Trash? Its service records stay in the log.`)) return;
+  try { await api('Vehicles', 'delete', { id: v.id }); hide('#vehOv'); toast('Vehicle moved to Trash'); } catch (e) { $('#vMsg').textContent = '⚠ ' + e.message; }
 };
 $('#mSave').onclick = saveMx;
 $('#mDel').onclick = async () => {
-  if (!confirm('Delete this service record?')) return;
-  try { await api('Maintenance', 'delete', { id: S.editing }); hide('#mxOv'); toast('Record deleted'); } catch (e) { $('#mMsg').textContent = '⚠ ' + e.message; }
+  if (!S.me) { $('#mMsg').textContent = 'Pick your name at the top (“I am”) first.'; return; }
+  if (!confirm('Move this service record to Trash?')) return;
+  try { await api('Maintenance', 'delete', { id: S.editing }); hide('#mxOv'); toast('Record moved to Trash'); } catch (e) { $('#mMsg').textContent = '⚠ ' + e.message; }
 };
 $('#mform').plate.onchange = mxHints;
 $('#mform').service.onchange = mxHints;
 
 $('#refreshBtn').onclick = () => load();
 $('#listsBtn').onclick = openLists;
+$('#histBtn').onclick = () => openHistory('trash');
+$('#hTabs').onclick = e => { const b = e.target.closest('button'); if (b) { S.htab = b.dataset.h; renderHistory(true); } };
+['hUser', 'hAction', 'hType'].forEach(id => $('#' + id).onchange = () => renderHistory());
+$('#hSearch').oninput = () => renderHistory();
+$('#hBody').addEventListener('click', async e => {
+  const b = e.target.closest('[data-restore],[data-purge],[data-more]'); if (!b) return;
+  if (b.dataset.more) { S.hlimit += 200; renderHistory(); return; }
+  if (!S.me) { $('#hMsg').textContent = '⚠ Pick your name at the top (“I am”) first.'; return; }
+  try {
+    if (b.dataset.restore) { await histApi('restore', { tids: [b.dataset.restore] }); toast('Restored'); }
+    else { if (!confirm('Delete this item forever? This cannot be undone.')) return; await histApi('purge', { tids: [b.dataset.purge] }); toast('Deleted forever'); }
+    renderHistory();
+  } catch (err) { $('#hMsg').textContent = '⚠ ' + err.message; }
+});
+$('#hEmpty').onclick = async () => {
+  if (!S.trash.length) return;
+  if (!S.me) { $('#hMsg').textContent = '⚠ Pick your name at the top (“I am”) first.'; return; }
+  if (!confirm('Permanently delete all ' + S.trash.length + ' items in Trash? This cannot be undone.')) return;
+  try { await histApi('purge', { all: true }); toast('Trash emptied'); renderHistory(); } catch (err) { $('#hMsg').textContent = '⚠ ' + err.message; }
+};
 $('#lTabs').onclick = e => { const b = e.target.closest('button'); if (b) { S.ltab = b.dataset.l; $('#lSearch').value = ''; renderLists(); } };
 $('#lSearch').oninput = renderLists;
 $('#lAdd').onclick = () => {
